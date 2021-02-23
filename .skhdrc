@@ -5,23 +5,27 @@
 default < ctrl - 7 ; move
 move < escape ; default
 
+# focus monitor
+alt - 7 : yabai -m display --focus 1
+alt - 8 : yabai -m display --focus 2
+
 # focus window
 cmd - h : yabai -m window --focus west
 cmd - l : yabai -m window --focus east
 cmd - j : yabai -m window --focus south
 cmd - k : yabai -m window --focus north
 
-# move managed window
-move <  shift - h : yabai -m window --warp west ; skhd -k "escape"
-move <  shift - l : yabai -m window --warp east ; skhd -k "escape"
-move <  shift - k : yabai -m window --warp north ; skhd -k "escape"
-move <  shift - j : yabai -m window --warp south ; skhd -k "escape"
-
 # swap managed window
 move < h : yabai -m window --swap west ; skhd -k "escape"
 move < l : yabai -m window --swap east ; skhd -k "escape"
 move < k : yabai -m window --swap north ; skhd -k "escape"
 move < j : yabai -m window --swap south ; skhd -k "escape"
+
+# move managed window
+move <  shift - h : yabai -m window --warp west ; skhd -k "escape"
+move <  shift - l : yabai -m window --warp east ; skhd -k "escape"
+move <  shift - k : yabai -m window --warp north ; skhd -k "escape"
+move <  shift - j : yabai -m window --warp south ; skhd -k "escape"
 
 # fast focus desktop
 ctrl + alt - space : yabai -m space --focus recent
@@ -30,7 +34,11 @@ ctrl + alt - 8 : yabai -m space --focus 2
 ctrl + alt - 9 : yabai -m space --focus 3
 ctrl + alt - 0 : yabai -m space --focus 4
 ctrl + alt - return : yabai -m space --focus 5
-
+ctrl + cmd - 7 : yabai -m space --focus 6
+ctrl + cmd - 8 : yabai -m space --focus 7
+ctrl + cmd - 9 : yabai -m space --focus 8
+ctrl + cmd - 0 : yabai -m space --focus 9
+ctrl + cmd - return : yabai -m space --focus 10
 
 # change layout of desktop
 move < a : yabai -m space --layout bsp ; skhd -k "escape"
@@ -62,6 +70,11 @@ move < ctrl - 8 : yabai -m window --space  2; yabai -m space --focus 2 ; skhd -k
 move < ctrl - 9 : yabai -m window --space  3; yabai -m space --focus 3 ; skhd -k "escape"
 move < ctrl - 0 : yabai -m window --space  4; yabai -m space --focus 4 ; skhd -k "escape"
 move < ctrl - return : yabai -m window --space  5; yabai -m space --focus 5 ; skhd -k "escape"
+move < alt - 7 : yabai -m window --space  6; yabai -m space --focus 6 ; skhd -k "escape"
+move < alt - 8 : yabai -m window --space  7; yabai -m space --focus 7 ; skhd -k "escape"
+move < alt - 9 : yabai -m window --space  8; yabai -m space --focus 8 ; skhd -k "escape"
+move < alt - 0 : yabai -m window --space  9; yabai -m space --focus 9 ; skhd -k "escape"
+move < alt - return : yabai -m window --space  10; yabai -m space --focus 10 ; skhd -k "escape"
 
 # make floating window fill screen
 shift + alt - i     : yabai -m window --grid 1:1:0:0:1:1
@@ -76,12 +89,18 @@ shift + alt - m   : yabai -m window --grid 2:2:1:1:1:1
 
 
 # create desktop, move window and follow focus - uses jq for parsing json (brew install jq)
-shift + cmd - n : yabai -m space --create && \
-                  index="$(yabai -m query --spaces --display | jq 'map(select(."native-fullscreen" == 0))[-1].index')" && \
-                  yabai -m window --space "${index}" && \
-                  yabai -m space --focus "${index}"
+# shift + cmd - n : yabai -m space --create && \
+#                   index="$(yabai -m query --spaces --display | jq 'map(select(."native-fullscreen" == 0))[-1].index')" && \
+#                   yabai -m window --space "${index}" && \
+#                   yabai -m space --focus "${index}"
 
 # delete desktop
 shift + cmd - backspace : skhd --key "cmd - w"; yabai -m space --destroy
 
 # shift + cmd - backspace : osascript -e 'tell application "System Events" to perform action "AXPress" of (first button whose subrole is "AXCloseButton") of (first window whose subrole is "AXStandardWindow") of (first process whose frontmost is true)' ; yabai -m space --destroy
+# prevents skhd from monitoring events for listed processes.
+
+# .blacklist [ "anki" ]
+# quick restart yabai = run in zsh yabairestart
+
+

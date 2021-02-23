@@ -122,12 +122,14 @@ set statusline="  Hint: %z%= %A %10u:%-7g %15s %20d  "
 
 mark T ~/.Trash
 mark h ~/
+mark d ~/dotfiles
+mark D ~/Downloads
 mark v ~/Develop/
 mark f ~/.config/vifm/ vifmrc
 mark e ~/.emacs.d/ settings.org
-mark y ~/.yabairc
-mark z ~/.zshrc
-mark s ~/.skhdrc
+mark y ~/dotfiles/ .yabairc
+mark z ~/dotfiles/ .zshrc
+mark s ~/dotfiles/ .skhdrc
 
 " ------------------------------------------------------------------------------
 
@@ -428,5 +430,5 @@ set grepprg=ag\ --line-numbers\ %i\ %a\ %s
 set findprg=find
 nnoremap ,ff :!ag -g %M  
 
-
-
+" open finder in current dir
+nnoremap ,F :!open .<cr>

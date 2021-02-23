@@ -163,10 +163,11 @@ noremap <leader>w  :wa<Cr>
 " set cc=80                   " set an 80 column border for good coding style
 
 "set key bindings for quick window movement----------------------------
-nnoremap <C-h> <C-w>h
-nnoremap <C-j> <C-w>j
-nnoremap <C-k> <C-w>k
-nnoremap <C-l> <C-w>l
+nnoremap <A-o> <C-w><C-w>
+" nnoremap <C-h> <C-w>h
+" nnoremap <C-j> <C-w>j
+" nnoremap <C-k> <C-w>k
+" nnoremap <C-l> <C-w>l
 " 
 
 " Maintain undo history between sessions

@@ -21,7 +21,7 @@ Plugin 'idanarye/vim-merginal'
 Plugin 'tomtom/tcomment_vim'
 Plugin 'tpope/vim-unimpaired'
 Plugin 'morhetz/gruvbox'
-Plugin 'mattn/emmet-vim'
+" Plugin 'mattn/emmet-vim'
 Plugin 'easymotion/vim-easymotion'
 Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
@@ -63,7 +63,9 @@ filetype plugin indent on    " required
 "set encoding, leader and edit vimrc ----------------------------
 scriptencoding utf-8
 set encoding=utf-8 
-:let mapleader = ","
+set fileencoding=utf-8
+set file
+let mapleader = ","
 nnoremap <leader>ev :e $HOME/.vimrc<cr>
 " nnoremap <leader>sv :source ~/.vimrc<cr>
 " 

@@ -112,6 +112,7 @@ fi
 alias zcfg='nvim ~/.zshrc'
 alias vm='nvim'
 alias fm='cd "$(/usr/local/bin/vifm --choose-dir - $@)"'
+alias yabairestart='launchctl kickstart -k "gui/${UID}/homebrew.mxcl.yabai"'
 
 # nvm config
 export NVM_DIR="$HOME/.nvm"
@@ -119,5 +120,8 @@ NVM_AUTOLOAD=1
 
 # autocompletion
 # source path/to/zsh-autocomplete.plugin.zsh
-source $ZSH/custom/plugins/zsh-autocomplete/zsh-autocomplete.plugin.zsh
+# source $ZSH/custom/plugins/zsh-autocomplete/zsh-autocomplete.plugin.zsh
+# To make Tab or ShiftTab activate menu selection
+# zstyle ':autocomplete:tab:*' widget-style menu-select
+# bindkey $key[Up] down-line-or-history
 
