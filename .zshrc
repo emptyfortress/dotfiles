@@ -77,6 +77,7 @@ plugins=(
 	zsh-syntax-highlighting
 	nvm
 	gulp
+	fasd
 )
 
 VI_MODE_SET_CURSOR=true
@@ -113,6 +114,7 @@ alias zcfg='nvim ~/.zshrc'
 alias vm='nvim'
 alias fm='cd "$(/usr/local/bin/vifm --choose-dir - $@)"'
 alias yabairestart='launchctl kickstart -k "gui/${UID}/homebrew.mxcl.yabai"'
+alias python3/dyn='python3'
 
 # nvm config
 export NVM_DIR="$HOME/.nvm"
@@ -125,3 +127,5 @@ NVM_AUTOLOAD=1
 # zstyle ':autocomplete:tab:*' widget-style menu-select
 # bindkey $key[Up] down-line-or-history
 
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
