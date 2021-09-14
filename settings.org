@@ -1,0 +1,1156 @@
+* Setup
+
+** Edit config
+#+BEGIN_SRC emacs-lisp
+  (defun find-config ()
+    "Edit settings.org"
+    (interactive)
+    (find-file "~/.emacs.d/settings.org"))
+  (global-set-key (kbd "C-c i") 'find-config)
+#+END_SRC
+
+** Remove bells
+#+BEGIN_SRC emacs-lisp
+  ;; (menu-bar-mode -1)
+  (scroll-bar-mode 0)
+  (tool-bar-mode 0)
+  (setq visible-bell nil)
+  (setq ring-bell-function 'ignore)
+  (setq inhibit-startup-message t)
+  (setq initial-scratch-message nil)
+#+END_SRC
+
+** maximize window
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'initial-frame-alist '(fullscreen . maximized))
+  ;; (add-to-list 'default-frame-alist '(fullscreen . fullheight))
+
+  ;; fancy titlebar
+  (use-package emacs
+  :init
+  (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+  (add-to-list 'default-frame-alist '(ns-appearance . dark))
+  (setq ns-use-proxy-icon  nil)
+  (setq frame-title-format nil)
+  )
+
+#+END_SRC
+** Misc
+#+BEGIN_SRC emacs-lisp
+   (setq exec-path-from-shell-check-startup-files nil)
+   (setq default-input-method "russian-computer")
+   (defalias 'yes-or-no-p 'y-or-n-p)
+   (line-number-mode 1)
+   (column-number-mode 1)
+   (set-frame-font "Input-18:antialiasing=false")
+   ;; Disable backup/autosave files
+   (setq make-backup-files nil)
+   (setq auto-save-default nil)
+   (setq auto-save-list-file-name nil)
+
+  ;; show relative line numbers
+  (global-display-line-numbers-mode -1)
+  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+  (menu-bar--display-line-numbers-mode-relative)
+  (setq display-line-numbers-current-absolute t)
+   (global-hl-line-mode 1)
+   ;; (global-visual-line-mode t)
+   (electric-pair-mode 1)
+   (blink-cursor-mode 0)
+
+   (setq require-final-newline t) ;; remove end of file message in magit
+
+   (setq show-paren-delay 0)
+   (show-paren-mode 1)
+
+#+END_SRC
+
+** Evil
+#+BEGIN_SRC emacs-lisp
+    (use-package evil
+        :ensure t
+        :init
+        (setq evil-want-integration t)
+        (setq evil-want-keybinding nil)
+        (setq evil-vsplit-window-right t)
+        :config
+        (evil-mode 1))
+
+    (use-package evil-collection
+        :after evil
+        :ensure t
+        :config
+        (evil-collection-init))
+
+    (use-package evil-leader
+        :ensure t
+        :config
+        (global-evil-leader-mode))
+
+    (use-package evil-surround
+        :ensure t
+        :config
+        (global-evil-surround-mode))
+
+    ;; evil org mode
+    (use-package evil-org
+        :ensure t
+        :after org
+        :config
+        (add-hook 'org-mode-hook 'evil-org-mode)
+        (add-hook 'evil-org-mode-hook
+                (lambda () (evil-org-set-key-theme))))
+
+    (use-package evil-indent-textobject
+        :ensure t)
+
+    (use-package evil-commentary
+        :ensure t
+        :config
+        (evil-commentary-mode))
+
+#+END_SRC
+
+** General
+#+BEGIN_SRC emacs-lisp
+  (use-package general :ensure t)
+
+#+END_SRC
+
+** Drag stuff
+#+BEGIN_SRC emacs-lisp
+  (use-package drag-stuff                 ;
+    :ensure t)
+  (drag-stuff-global-mode 1)
+  (global-set-key (kbd "M-C-k") 'drag-stuff-up)
+  (global-set-key (kbd "M-C-j") 'drag-stuff-down)
+
+#+END_SRC
+
+** Main evil keybindings
+#+BEGIN_SRC emacs-lisp
+	  (general-define-key "M-o" 'other-window)
+	  (evil-leader/set-leader ",")
+
+	  (evil-leader/set-key
+	      "f" 'projectile-command-map
+	      "R" 'counsel-projectile-rg
+	      "w" 'save-buffer
+	      "v" 'evil-window-vsplit
+	      "o" 'delete-other-windows
+	      "k" 'kill-current-buffer
+	      "s" 'avy-goto-word-1
+	      "e" 'avy-goto-char-timer
+	      "l" 'avy-goto-line
+	      "b" 'ivy-switch-buffer
+	      "D" 'deer
+	      ",b" 'bookmark-jump
+	      ",v" 'vue-mode-reparse
+	      "c" 'org-capture
+	      "." 'org-time-stamp
+	      "a" 'org-agenda
+	      "gr" 'my-revert-buffer
+	      "gs" 'magit-status)
+
+	  (defun my-revert-buffer ()
+	    "Reload file from disk"
+	    (interactive)
+	    (revert-buffer t (not (buffer-modified-p)) t))
+
+	  (define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
+	  (define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line)
+
+	;; swap ;: for better experience
+	(general-swap-key nil 'motion
+	  ";" ":")
+
+      ;; remap find next char and reverse
+
+	  (general-define-key
+	  :states 'normal
+	  "SPC" 'evil-repeat-find-char)
+
+	  (general-define-key
+	  :states 'normal
+	    "DEL" 'evil-repeat-find-char-reverse)
+
+	  (general-define-key
+	  :states 'insert
+	    "C-h" 'delete-backward-char)
+    ;; scrolling
+    (setq-default
+     ;; left-margin-width 1 right-margin-width 1
+     ;; scroll-conservatively most-positive-fixnum
+     scroll-conservatively 100000       ; Always scroll by one line
+     scroll-margin 5
+     scroll-preserve-screen-position 1
+     cursor-in-non-selected-windows t)
+
+  ;; swap windows
+  (general-define-key
+   :states 'normal
+    :prefix ",,"
+   "x" 'window-swap-states)
+
+#+END_SRC
+
+** Ranger
+#+BEGIN_SRC emacs-lisp
+  (use-package ranger
+    :config
+    (ranger-override-dired-mode t)
+    (setq ranger-cleanup-eagerly t))
+  (defun xah-dired-mode-setup ()
+    "to be run as hook for `dired-mode'."
+    (dired-hide-details-mode 1))
+  (add-hook 'dired-mode-hook 'xah-dired-mode-setup)
+#+END_SRC
+** Org-mode evil keybindings
+#+BEGIN_SRC emacs-lisp
+    (evil-leader/set-key-for-mode 'org-mode
+        "A" 'org-archive-subtree
+        ",d" 'org-deadline
+        ",s" 'org-schedule
+        "go" 'org-open-at-point
+        "gt" 'org-set-tags-command
+        "r" 'org-refile
+        "t" 'org-todo
+        ",z" 'my-delete-capture-window
+        "z" 'my-save-and-close
+        )
+
+    (general-define-key
+    :keymaps 'org-mode-map
+    :states '(normal visual)
+    :prefix ","
+    "nn" '(org-narrow-to-subtree :which-key "narrow to subtree"))
+
+    (general-define-key
+    :keymaps 'org-mode-map
+    :states '(normal visual)
+    :prefix ","
+    "nw" '(widen :which-key "widen"))
+
+    (general-define-key
+        :keymaps 'org-mode-map
+        :states 'normal
+        "C-k" 'org-previous-visible-heading)
+
+    ;; open link on return in org-modes
+    (general-define-key
+        :keymaps 'org-mode-map
+        :states 'normal
+        "RET" 'org-open-at-point)
+
+    (defun my-delete-capture-window ()
+      "Run `org-capture-kill' and `delete-frame' in sequence."
+      (interactive)
+      (org-capture-kill)
+      (delete-frame))
+
+  (defun my-save-and-close ()
+    "save and close org-capture frame"
+    (interactive)
+    (org-capture-finalize)
+    (delete-frame))
+#+END_SRC
+
+** Quit minibuffer on escape
+#+BEGIN_SRC emacs-lisp
+(defun minibuffer-keyboard-quit ()
+    (interactive)
+    (if (and delete-selection-mode transient-mark-mode mark-active)
+	(setq deactivate-mark  t)
+    (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
+    (abort-recursive-edit)))
+
+    (define-key evil-visual-state-map [escape] 'keyboard-quit)
+    (define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
+    (define-key minibuffer-local-ns-map [escape] 'minibuffer-keyboard-quit)
+    (define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
+    (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
+    (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
+#+END_SRC
+
+** ivy swiper counsel
+#+BEGIN_SRC emacs-lisp
+  (use-package smex ;; smart M-x
+    :ensure t)
+
+  (use-package ivy
+    :ensure t
+    :diminish ivy-mode
+    :config
+    (ivy-mode t))
+
+  (setq ivy-initial-inputs-alist nil)
+  (setq ivy-use-virtual-buffers t)       ; extend searching to bookmarks and
+  (setq ivy-height 20)                   ; set height of the ivy window
+  (setq ivy-count-format "(%d/%d) ")     ; count format, from the ivy help page
+  (setq ivy-display-style 'fancy)
+  (setq ivy-format-function 'ivy-format-function-line) ; Make highlight extend all the way to the right
+  ;; TODO testing out the fuzzy search
+  (setq ivy-re-builders-alist
+        '((counsel-M-x . ivy--regex-fuzzy) ; Only counsel-M-x use flx fuzzy search
+          (t . ivy--regex-plus)))
+
+  (use-package counsel
+    :ensure t
+    :bind (("M-x" . counsel-M-x)))
+
+  (general-define-key
+   :states '(normal visual)
+   :prefix ","
+   "x" '(counsel-M-x :which-key "mycounsel"))
+
+  (use-package swiper
+    :ensure t)
+  (general-define-key
+   :states '(normal visual)
+   "/" '(swiper :which-key "swiper"))
+
+  (use-package ivy-hydra
+    :ensure t)
+
+#+END_SRC
+
+** Cursor color
+#+BEGIN_SRC emacs-lisp
+    (add-to-list 'load-path "/Users/admin/.emacs.d/lisp")
+    (require 'cursor-chg)  ; Load the library
+     ;; (toggle-cursor-type-when-idle 1) ; Turn on cursor change when Emacs is idle
+     (change-cursor-mode 1) ; Turn on change for overwrite, read-only, and input mode
+
+#+END_SRC
+
+** Magit
+#+BEGIN_SRC emacs-lisp
+  (use-package magit
+    :config
+      (setq magit-repository-directories '(("~/Develop/" . 2) ("~/org/" . 1) )))
+  ;; optional: this is the evil state that evil-magit will use
+  (setq evil-magit-state 'normal)
+  ;; optional: disable additional bindings for yanking text
+  (setq evil-magit-use-y-for-yank nil)
+
+#+END_SRC
+
+** Orgmode
+#+BEGIN_SRC emacs-lisp
+   (use-package org
+     :ensure org-plus-contrib)
+   (setq gtd-base-path (expand-file-name "/Users/admin/Develop/org/"))
+   (defun gtd-path (sub-path) (concat gtd-base-path sub-path))
+
+   (defvar inbox (gtd-path "inbox.org"))
+   (defvar gtd (gtd-path "gtd.org"))
+   (defvar foo (gtd-path "foo.org"))
+   (defvar journal (gtd-path "journal.org"))
+   (defvar someday (gtd-path "someday.org"))
+   (defvar tickler (gtd-path "tickler.org"))
+   (defvar ref (gtd-path "ref.org"))
+   ;; (defvar keys (gtd-path "keys.org"))
+
+   (setq org-agenda-files (list inbox foo journal gtd ref someday tickler))
+
+   (setq org-refile-targets `((gtd :maxlevel . 5)
+                              (ref :maxlevel . 5)
+                              (inbox :maxlevel . 5)
+                              (foo :maxlevel . 2)
+                              (journal :maxlevel . 2)
+                              (gtd :maxlevel . 2)
+                              (someday :maxlevel . 5)
+                              (tickler :maxlevel . 5)))
+
+   (setq org-refile-use-outline-path t)  ;; refile items in steps with ivy
+   (setq org-outline-path-complete-in-steps nil)
+   (setq org-refile-allow-creating-parent-nodes (quote confirm))
+   (setq org-agenda-todo-ignore-scheduled 'all) ;; ignore todo which is scheduled in todo list
+   (setq org-agenda-todo-ignore-deadlines 'all) ;; ignore deadlines in todo list
+   (setq calendar-week-start-day 1)
+
+   ;; set custom agenda view
+   (setq org-agenda-custom-commands
+         '(("f" "Ideas" todo "FOO")
+         ("b" "Купить" tags "buy")))
+
+   (defvar inbox-capture-template "* %i%?\n%U\n")
+   (defvar todo-capture-template "* TODO %i%?          \n%U\n%a\n")
+   (defvar tickler-capture-template "* %i%?\n%U\n")
+   (defvar keys-capture-template "* %?")
+
+   ;; this is something with capture links, I think
+   (defun transform-square-brackets-to-round-ones(string-to-transform)
+     "Transforms [ into ( and ] into ), other chars left unchanged."
+     (concat
+      (mapcar #'(lambda (c) (if (equal c ?[) ?\( (if (equal c ?]) ?\) c))) string-to-transform))
+     )
+
+   (setq org-capture-templates `(
+                                 ("i" "Inbox" entry (file inbox) ,inbox-capture-template)
+                                 ("t" "Inbox [TODO]" entry (file inbox) ,todo-capture-template)
+                                 ("T" "Tickler" entry (file+headline tickler "Tickler") ,tickler-capture-template)
+                                 ("f" "Foo" entry (file+headline foo "ideas") "* FOO %i%?")
+                                 ;; ("k" "Keys" entry (file+headline keys "Keys") ,keys-capture-template)
+                                 ("n" "Note" entry (file ref) ,inbox-capture-template)
+                                 ("j" "Journal" entry (file+olp+datetree "~/Develop/org/journal.org") "**** %<%H:%M> - %?\n%a\n" :tree-type week)
+                                 ("p" "Protocol" entry (file inbox)
+                                       "* %?\n%u\n\n%a\n \n%i\n")
+                                 ("L" "Link" entry (file inbox)
+                                  "* [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n%? \n\n%u")
+                                 ("m" "Meeting" entry (file inbox)
+                                  "* MEETING with %? :MEETING:\n%U\n\n" :clock-in t :clock-resume t)
+                                 ("b" "Buy" entry (file+headline gtd "Buy") "* %i%?\n%U")
+                                 ))
+
+   (setq org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "WAITING(w!)" "|" "DONE(d!)" "CANCELLED(c!)")
+                             (sequence "FOO(f)" "|" "ZEN(z!)")
+                             (sequence "BUG(B)" "|" "FIXED(x!)")))
+
+   (setq org-log-into-drawer 'LOGBOOK)
+
+   (setq org-todo-keyword-faces
+         '(("WAITING" . "#666565") ("CANCELLED" . "#663333") ("NEXT" . "Yellow") ("DONE" . "#00ff00") ("FOO" . "#51ABFF")))
+
+         (setq org-tag-alist
+         '(("work" . ?w)
+           ("home" . ?h)
+           ;; ("PRESENTATION" . ?p)
+           ;; ("BRAINSTORM" . ?s)
+           ("read" . ?r)
+           ("emacs" . ?e)
+           ("refile" . ?f)
+           ("code" . ?c)
+           ("movie" . ?m)))
+
+   ;; this for prettify orgmode
+   (setq org-startup-indented t
+         ;; org-ellipsis "  "
+         org-hide-leading-stars t
+         org-src-fontify-natively t
+         org-src-tab-acts-natively t
+         org-pretty-entities t
+         org-hide-emphasis-markers t
+         org-agenda-block-separator ""
+         org-fontify-whole-heading-line t
+         org-fontify-done-headline t
+         org-fontify-quote-and-verse-blocks t)
+  ;; start capture in insert mode
+
+  (add-hook 'org-capture-mode-hook 'evil-insert-state)
+#+END_SRC
+
+** org-agenda evil bindings
+#+BEGIN_SRC emacs-lisp
+    (eval-after-load 'org-agenda
+     '(progn
+        (evil-set-initial-state 'org-agenda-mode 'normal)
+        (evil-define-key 'normal org-agenda-mode-map
+          (kbd "<RET>") 'org-agenda-switch-to
+          (kbd "\t") 'org-agenda-goto
+
+          "q" 'org-agenda-quit
+          "x" 'org-agenda-exit
+          "r" 'org-agenda-refile
+          "a" 'org-archive-subtree-default
+          "gr" 'org-agenda-redo
+          "S" 'org-save-all-org-buffers
+          "gj" 'org-agenda-goto-date
+          "gJ" 'org-agenda-clock-goto
+          "gm" 'org-agenda-bulk-mark
+          "go" 'org-agenda-open-link
+          "s" 'org-agenda-schedule
+          "B" 'org-agenda-bulk-action
+          "+" 'org-agenda-priority-up
+          ;; "," 'org-agenda-priority
+          "-" 'org-agenda-priority-down
+          "y" 'org-agenda-todo-yesterday
+          "n" nil  ; evil-search-next
+          "n" 'org-agenda-add-note
+          "t" 'org-agenda-todo
+          ":" 'org-agenda-set-tags
+          ";" 'org-timer-set-timer
+          "I" 'org-agenda-clock-in
+          "O" 'org-agenda-clock-out
+          "u" 'org-agenda-bulk-unmark
+          "j"  'org-agenda-next-line
+          "k"  'org-agenda-previous-line
+          "vt" 'org-agenda-toggle-time-grid
+          "va" 'org-agenda-archives-mode
+          "vw" 'org-agenda-week-view
+          "vl" 'org-agenda-log-mode
+          "vd" 'org-agenda-day-view
+          "vc" 'org-agenda-show-clocking-issues
+          "g/" 'org-agenda-filter-by-tag
+          "o" 'delete-other-windows
+          "gh" 'org-agenda-holiday
+          "gv" 'org-agenda-view-mode-dispatch
+          "f" 'org-agenda-later
+          "b" 'org-agenda-earlier
+          "c" 'org-capture
+          "e" 'org-agenda-set-effort
+          "{" 'org-agenda-manipulate-query-add-re
+          "}" 'org-agenda-manipulate-query-subtract-re
+          "A" 'org-agenda-toggle-archive-tag
+          "." 'org-agenda-goto-today
+          ;; "0" 'evil-digit-argument-or-evil-beginning-of-line
+          ;; "<" 'org-agenda-filter-by-category
+          ">" 'org-agenda-date-prompt
+          "F" 'org-agenda-follow-mode
+          "D" 'org-agenda-deadline
+          "H" 'org-agenda-holidays
+          "J" 'org-agenda-next-date-line
+          "K" 'org-agenda-previous-date-line
+          "L" 'org-agenda-recenter
+          ;; "P" 'org-agenda-show-priority
+          "R" 'org-agenda-clockreport-mode
+          "Z" 'org-agenda-sunrise-sunset
+          "T" 'org-agenda-show-tags
+          "X" 'org-agenda-clock-cancel
+          "[" 'org-agenda-manipulate-query-add
+          ;; "g\\" 'org-agenda-filter-by-tag-refine
+          "]" 'org-agenda-manipulate-query-subtract)))
+
+#+END_SRC
+
+** custom agenda views
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-custom-commands
+        '(("n" "Agenda and all todo"
+           ((agenda "")
+            (alltodo ""
+                     ((org-agenda-skip-function
+                       '(org-agenda-skip-entry-if 'todo '("FOO"))
+                       ))
+                     )))
+          ("w" "Waiting state"
+           ((agenda "")
+            (todo "WAITING")))
+          ("d" "Upcoming deadlines" agenda ""
+           ((org-agenda-entry-types '(:deadline))
+            ;; a slower way to do the same thing
+            ;; (org-agenda-skip-function '(org-agenda-skip-entry-if 'notdeadline))
+            (org-agenda-span 1)
+            (org-deadline-warning-days 60)
+            (org-agenda-time-grid nil)))
+          ("f" "foo"
+           ((todo "FOO")))
+          ("b" "buy"
+           ((tags "buy")))
+          ("A" "Archive search" search ""
+           ((org-agenda-files (file-expand-wildcards "~/Develop/org/*.org_archive"))))
+          )
+        )
+
+#+END_SRC
+
+** Avy
+#+BEGIN_SRC emacs-lisp
+  (use-package avy :ensure t
+    :commands (avy-goto-word-1))
+#+END_SRC
+
+** Smart mode line
+#+BEGIN_SRC emacs-lisp
+  (use-package smart-mode-line-powerline-theme
+    :ensure t)
+
+  (use-package smart-mode-line
+    :ensure t
+    :config
+    (setq sml/theme 'powerline)
+    (add-hook 'after-init-hook 'sml/setup))
+
+  ;; (use-package diminish
+  ;;   :ensure t) ;; remove minor mode from smartline
+
+#+END_SRC
+
+** evil-numbers
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-numbers
+    :ensure t)
+  (define-key evil-normal-state-map (kbd "C-=") 'evil-numbers/inc-at-pt)
+  (define-key evil-normal-state-map (kbd "C--") 'evil-numbers/dec-at-pt)
+
+#+END_SRC
+
+** Evil-googles
+package show feedback on evil edit code
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-goggles
+    :ensure t
+    :config
+    (evil-goggles-mode))
+#+END_SRC
+
+** kill-ring
+#+BEGIN_SRC emacs-lisp
+  (defun my-paste-inside-delimiters ()
+    "Select text between the nearest left and right delimiters.
+    and yank value from kill-ring."
+    (interactive)
+    (let (
+          ($skipChars
+           (if (boundp 'xah-brackets)
+               (concat "^\"" xah-brackets)
+             "^\"\\'<>(){}[]“”‘’‹›«»「」『』【】〖〗《》〈〉〔〕（）"))
+          $pos)
+      (skip-chars-backward $skipChars)
+      (setq $pos (point))
+      (skip-chars-forward $skipChars)
+      (set-mark $pos)
+      (delete-active-region)
+      (yank)))
+  (general-define-key
+   :states 'normal
+   "M-y" 'my-paste-inside-delimiters)
+
+  (general-define-key
+   :states 'normal
+   "M-C-y" 'counsel-yank-pop)
+
+#+END_SRC
+
+** ace-window
+#+BEGIN_SRC emacs-lisp
+  (use-package ace-window
+    :config
+    (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+    :bind ("M-o" . ace-window))
+
+#+END_SRC
+
+** narrowing
+#+BEGIN_SRC emacs-lisp
+    (general-define-key
+    :states '(normal visual)
+    :prefix ","
+    "nn" '(narrow-to-region :which-key "narrow to region"))
+
+    (general-define-key
+    :states '(normal visual)
+    :prefix ","
+    "nw" '(widen :which-key "widen"))
+
+#+END_SRC
+
+** fold
+#+BEGIN_SRC emacs-lisp
+  (require 'vimish-fold)
+  (use-package vimish-fold
+    :ensure
+    :after evil)
+
+  (use-package evil-vimish-fold
+    :ensure
+    :after vimish-fold
+    :init
+    (setq evil-vimish-fold-mode-lighter " ⮒")
+    (setq evil-vimish-fold-target-modes '(prog-mode conf-mode text-mode))
+    :config
+    (global-evil-vimish-fold-mode))
+
+  (general-define-key
+   :states 'normal
+   "zf" 'vimish-fold-avy)
+#+END_SRC
+
+** Insert blank lines
+#+BEGIN_SRC emacs-lisp
+  (defun around-line ()
+    "Insert an empty line above and below the current line."
+    (interactive)
+    (save-excursion
+      (end-of-line)
+      (open-line 1)
+      (end-of-line 0)
+      (open-line 1)))
+
+  (general-define-key
+   :states '(normal visual)
+   :prefix ",,"
+   "a" 'around-line)
+
+#+END_SRC
+
+** yasnippet
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet
+    :ensure t
+    :init
+    (yas-global-mode 1)
+    :config
+    (setq yas-indent-line nil)
+    (define-key yas-minor-mode-map (kbd "<tab>") nil)
+    (define-key yas-minor-mode-map (kbd "TAB") nil)
+    ;; Bind `SPC' to `yas-expand' when snippet expansion available (it
+    ;; will still call `self-insert-command' otherwise).
+    (define-key yas-minor-mode-map (kbd "SPC") yas-maybe-expand)
+    ;; (define-key yas-minor-mode-map (kbd "TAB") #'yas-expand)
+    ;; (define-key yas-minor-mode-map (kbd "<tab>") #'yas-expand)
+    )
+
+  (general-define-key
+   :states '(normal visual)
+   :prefix ","
+   "ya" 'yas-new-snippet)
+
+  (general-define-key
+   :states '(normal visual)
+   :prefix ","
+   "yv" 'yas-visit-snippet-file)
+#+END_SRC
+
+** JScript
+#+BEGIN_SRC emacs-lisp
+  (use-package js
+    :ensure nil
+    :delight js-mode "JavaScript"
+    :preface
+    ;; (defun me/js-prettify-symbols-mode-on ()
+    ;;   (add-to-list 'prettify-symbols-alist '("function" . ?\u0192))
+    ;;   (prettify-symbols-mode 1))
+    ;; :hook (js-mode . me/js-prettify-symbols-mode-on)
+    :config (setq-default js-indent-level 2))
+
+  (use-package json-mode
+    :delight json-mode "JSON"
+    :mode "\\.json\\'"
+    :preface
+    (defun me/json-set-indent-level ()
+      (setq-local js-indent-level 2))
+    :hook (json-mode . me/json-set-indent-level))
+
+#+END_SRC
+
+** Vue
+#+BEGIN_SRC emacs-lisp
+  (use-package vue-mode
+    :ensure t)
+    (add-hook 'vue-mode-hook
+              (lambda ()
+                (set-face-background 'mmm-default-submode-face nil)))
+    (electric-pair-mode 1)
+    ;; (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
+    ;; (add-hook 'vue-mode-hook 'prettier-mode t)
+    (add-hook 'vue-mode-hook (lambda() (display-line-numbers-mode 1)))
+
+    (global-set-key (kbd "C-c C-e") 'vue-mode-edit-indirect-at-point)
+    (add-to-list 'write-file-functions 'delete-trailing-whitespace)
+#+END_SRC
+
+** Projectile
+ #+BEGIN_SRC emacs-lisp
+   (use-package projectile
+     :ensure t
+     :config
+     (projectile-global-mode)
+     (setq projectile-enable-caching t)
+     (setq projectile-project-search-path '("~/Develop/"))
+     (setq projectile-completion-system 'ivy))
+   (use-package counsel-projectile
+     :ensure t
+     :config
+     (counsel-projectile-mode))
+ #+END_SRC
+
+** Tab config
+#+BEGIN_SRC emacs-lisp
+  ;; Create a variable for our preferred tab width
+  (setq custom-tab-width 2)
+
+  ;; Two callable functions for enabling/disabling tabs in Emacs
+  (defun disable-tabs () (setq indent-tabs-mode nil))
+  (defun enable-tabs  ()
+    (local-set-key (kbd "TAB") 'tab-to-tab-stop)
+    (setq indent-tabs-mode t)
+    (setq tab-width custom-tab-width))
+
+  ;; Hooks to Enable Tabs
+  (add-hook 'prog-mode-hook 'enable-tabs)
+  (add-hook 'vue-mode-hook 'enable-tabs)
+  (add-hook 'web-mode-hook 'enable-tabs)
+  (add-hook 'csv-mode-hook 'enable-tabs)
+  ;; Hooks to Disable Tabs
+  (add-hook 'lisp-mode-hook 'disable-tabs)
+  (add-hook 'emacs-lisp-mode-hook 'disable-tabs)
+
+  ;; Language-Specific Tweaks
+  (setq-default python-indent-offset custom-tab-width) ;; Python
+  (setq-default js-indent-level custom-tab-width)      ;; Javascript
+  (setq-default typescript-indent-level custom-tab-width)      ;; Javascript
+  (setq-default csv-indent-level custom-tab-width)      ;; Javascript
+  (setq-default css-indent-level custom-tab-width)      ;; css
+
+  ;; Making electric-indent behave sanely
+  (setq-default electric-indent-inhibit t)
+
+  ;; Make the backspace properly erase the tab instead of
+  ;; removing 1 space at a time.
+  (setq backward-delete-char-untabify-method 'hungry)
+
+  ;; (OPTIONAL) Shift width for evil-mode users
+  ;; For the vim-like motions of ">>" and "<<".
+  (setq-default evil-shift-width custom-tab-width)
+  (setq pug-tab-width 2)
+  (setq css-indent-offset 2)
+  ;; WARNING: This will change your life
+  ;; (OPTIONAL) Visualize tabs as a pipe character - "|"
+  ;; This will also show trailing characters as they are useful to spot.
+  (setq whitespace-style '(face tabs tab-mark trailing))
+
+  (setq whitespace-display-mappings
+        '((tab-mark 9 [124 9] [92 9]))) ; 124 is the ascii ID for '\|'
+  (global-whitespace-mode) ; Enable whitespace mode everywhere
+
+#+END_SRC
+
+** lsp
+#+BEGIN_SRC emacs-lisp
+    ;; (use-package lsp-mode
+    ;;   :init
+    ;;   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+    ;;   (setq lsp-keymap-prefix "C-c l")
+    ;;   :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+    ;;           (js-mode . lsp-deferred)
+    ;;           (typescript-mode . lsp-deferred)
+    ;;           (vue-mode . lsp-deferred)
+    ;;           ;; if you want which-key integration
+    ;;           (lsp-mode . lsp-enable-which-key-integration))
+    ;;   :commands (lsp lsp-deferred))
+
+  (use-package lsp-mode
+    :custom
+    (lsp-vetur-format-default-formatter-css "none")
+    (lsp-vetur-format-default-formatter-html "none")
+    (lsp-vetur-format-default-formatter-js "none")
+    (lsp-vetur-validation-template nil))
+
+  (use-package lsp-ui
+  :hook (lsp-mode . lsp-ui-mode)
+  :custom
+  (lsp-ui-doc-position 'bottom))
+
+  (use-package lsp-ivy)
+
+#+END_SRC
+
+** flycheck
+#+BEGIN_SRC emacs-lisp
+(defun my/use-eslint-from-node-modules ()
+  (let* ((root (locate-dominating-file
+                (or (buffer-file-name) default-directory)
+                "node_modules"))
+         (eslint
+          (and root
+               (expand-file-name "node_modules/.bin/eslint"
+                                 root))))
+    (when (and eslint (file-executable-p eslint))
+      (setq-local flycheck-javascript-eslint-executable eslint))))
+
+(add-hook 'flycheck-mode-hook #'my/use-eslint-from-node-modules)
+
+      (use-package flycheck
+        :ensure t
+        :init (global-flycheck-mode))
+
+      ;; turn on flychecking globally
+      (add-hook 'after-init-hook #'global-flycheck-mode)
+        (setq flycheck-check-syntax-automatically '(mode-enabled save))
+
+      (general-define-key
+        :states 'normal
+        :prefix ","
+        "f n" 'flycheck-next-error)
+
+        ;; fix file and revert
+
+  (defun eslint-fix-file ()
+    (interactive)
+    (message "eslint --fixing the file" (buffer-file-name))
+    (shell-command (concat "eslint --fix " (buffer-file-name))))
+
+  (defun eslint-fix-file-and-revert ()
+    (interactive)
+    (eslint-fix-file)
+    (revert-buffer t t))
+
+#+END_SRC
+
+** environment
+#+BEGIN_SRC emacs-lisp
+  (use-package exec-path-from-shell)
+  (when (memq window-system '(mac ns))
+    (exec-path-from-shell-initialize))
+
+#+END_SRC
+
+** abbrev
+#+BEGIN_SRC emacs-lisp
+  (load "~/.emacs.d/lisp/my-abbrev.el")
+  (defun insert-space-or-expand-abbrev ()
+    "Expand abbrev if previous char is a space, or insert a space."
+    (interactive)
+    (if (not (equal (char-before) ?\s))
+        (insert-char ?\s)
+      (backward-char)
+      (unless (expand-abbrev)
+        (insert-char ?\s))
+      (forward-char)))
+
+  (global-set-key " " #'insert-space-or-expand-abbrev)
+#+END_SRC
+** emojify
+#+BEGIN_SRC emacs-lisp
+  (use-package emojify :ensure t)
+  (add-hook 'after-init-hook #'global-emojify-mode) ;; add emojify
+#+END_SRC
+
+:smile:
+
+** Chrome capture
+#+BEGIN_SRC emacs-lisp
+  (require 'org-capture)
+  (require 'org-protocol)
+  (server-start)
+
+#+END_SRC
+** org-roam
+#+BEGIN_SRC emacs-lisp
+  (use-package org-roam
+    :ensure t
+    :init
+    (setq org-roam-v2-ack t)
+    :custom
+    (org-roam-directory (file-truename "~/Develop/org/roam/"))
+    :bind (("C-c n l" . org-roam-buffer-toggle)
+           ("C-c n f" . org-roam-node-find)
+           ("C-c n g" . org-roam-graph)
+           ("C-c n i" . org-roam-node-insert)
+           ("C-c n c" . org-roam-capture)
+           ;; Dailies
+           ("C-c n j" . org-roam-dailies-capture-today))
+    :config
+    (org-roam-db-autosync-mode))
+    ;; If using org-roam-protocol
+    ;; (require 'org-roam-protocol))
+
+#+END_SRC
+** deft
+#+BEGIN_SRC emacs-lisp
+  (use-package deft
+    :config
+    (setq deft-extensions '("org")
+          deft-directory "/Users/admin/Dropbox/org/roam"
+          deft-recursive t
+          deft-auto-save-interval 30.0
+          deft-default-extension "org"
+          ;; deft-strip-title-regexp "^:PROPERTIES:"
+          ;; deft-strip-summary-regexp ":PROPERTIES:\n\\(.+\n\\)+:END:\n"
+          ;; deft-use-filter-string-for-filename t
+          deft-use-filename-as-title t)
+    )
+
+  ;; parse title and summury https://github.com/jrblevin/deft/issues/75#issuecomment-905031872
+  (defun cm/deft-parse-title (file contents)
+    "Parse the given FILE and CONTENTS and determine the title.
+           If `deft-use-filename-as-title' is nil, the title is taken to
+           be the first non-empty line of the FILE.  Else the base name of the FILE is
+           used as title."
+    (let ((begin (string-match "^#\\+[tT][iI][tT][lL][eE]: .*$" contents)))
+      (if begin
+          (string-trim (substring contents begin (match-end 0)) "#\\+[tT][iI][tT][lL][eE]: *" "[\n\t ]+")
+        (deft-base-filename file))))
+
+  (advice-add 'deft-parse-title :override #'cm/deft-parse-title)
+
+  (setq deft-strip-summary-regexp
+        (concat "\\("
+                "[\n\t]" ;; blank
+                "\\|^#\\+[[:alpha:]_]+:.*$" ;; org-mode metadata
+                "\\|^:PROPERTIES:\n\\(.+\n\\)+:END:\n"
+                "\\)"))
+
+  ;; (add-hook 'deft-mode-hook (lambda() (display-line-numbers-mode -1)))
+  ;; (add-hook 'deft-mode-hook 'evil-insert-state)
+
+  (general-define-key
+   :states 'insert
+   :keymaps 'deft-mode-map
+   "C-n" 'evil-next-visual-line)
+
+  (general-define-key
+   :states 'insert
+   :keymaps 'deft-mode-map
+   "C-p" 'evil-previous-visual-line)
+
+  (use-package zetteldeft
+    :ensure t
+    :after deft
+    :config (zetteldeft-set-classic-keybindings))
+
+#+END_SRC
+
+#+RESULTS:
+
+** rotate text
+#+BEGIN_SRC emacs-lisp
+  (defvar rotate-text-rotations
+    '(("true" "false")
+      ("left" "right" "top" "bottom")
+      ("width" "height")
+      ("margin" "padding")
+      ("pointer" "default" "arrow")
+      ("block" "inline-box" "flex" "inline")
+      ("relative" "absolute" "fixed" "static")
+      ("yes" "no"))
+    "List of text rotation sets.")
+
+  (defun rotate-region (beg end)
+    "Rotate all matches in `rotate-text-rotations' between point and mark."
+    (interactive "r")
+    (let ((regexp (rotate-convert-rotations-to-regexp
+                   rotate-text-rotations))
+          (end-mark (copy-marker end)))
+      (save-excursion
+        (goto-char beg)
+        (while (re-search-forward regexp (marker-position end-mark) t)
+          (let* ((found (match-string 0))
+                 (replace (rotate-next found)))
+            (replace-match replace))))))
+
+  (defun rotate-string (string &optional rotations)
+    "Rotate all matches in STRING using associations in ROTATIONS.
+      If ROTATIONS are not given it defaults to `rotate-text-rotations'."
+    (let ((regexp (rotate-convert-rotations-to-regexp
+                   (or rotations rotate-text-rotations)))
+          (start 0))
+      (while (string-match regexp string start)
+        (let* ((found (match-string 0 string))
+               (replace (rotate-next
+                         found
+                         (or rotations rotate-text-rotations))))
+          (setq start (+ (match-end 0)
+                         (- (length replace) (length found))))
+          (setq string (replace-match replace nil t string))))
+      string))
+
+  (defun rotate-next (string &optional rotations)
+    "Return the next element after STRING in ROTATIONS."
+    (let ((rots (rotate-get-rotations-for
+                 string
+                 (or rotations rotate-text-rotations))))
+      (if (> (length rots) 1)
+          (error (format "Ambiguous rotation for %s" string))
+        (if (< (length rots) 1)
+            ;; If we get this far, this should not occur:
+            (error (format "Unknown rotation for %s" string))
+          (let ((occurs-in-rots (member string (car rots))))
+            (if (null occurs-in-rots)
+                ;; If we get this far, this should *never* occur:
+                (error (format "Unknown rotation for %s" string))
+              (if (null (cdr occurs-in-rots))
+                  (caar rots)
+                (cadr occurs-in-rots))))))))
+
+  (defun rotate-get-rotations-for (string &optional rotations)
+    "Return the string rotations for STRING in ROTATIONS."
+    (remq nil (mapcar (lambda (rot) (if (member string rot) rot))
+                      (or rotations rotate-text-rotations))))
+
+  (defun rotate-convert-rotations-to-regexp (rotations)
+    (regexp-opt (rotate-flatten-list rotations)))
+
+  (defun rotate-flatten-list (list-of-lists)
+    "Flatten LIST-OF-LISTS to a single list.
+      Example:
+        (rotate-flatten-list '((a b c) (1 ((2 3)))))
+          => (a b c 1 2 3)"
+    (if (null list-of-lists)
+        list-of-lists
+      (if (listp list-of-lists)
+          (append (rotate-flatten-list (car list-of-lists))
+                  (rotate-flatten-list (cdr list-of-lists)))
+        (list list-of-lists))))
+
+  (defun rotate-word-at-point ()
+    "Rotate word at point based on sets in `rotate-text-rotations'."
+    (interactive)
+    (let ((bounds (bounds-of-thing-at-point 'word))
+          (opoint (point)))
+      (when (consp bounds)
+        (let ((beg (car bounds))
+              (end (copy-marker (cdr bounds))))
+          (rotate-region beg end)
+          (goto-char (if (> opoint end) end opoint))))))
+
+  (general-define-key
+  :states 'normal
+    "gs" 'rotate-word-at-point)
+
+  (defun indent-or-rotate ()
+    "If point is at end of a word, then else indent the line."
+    (interactive)
+    (if (looking-at "\\>")
+        (rotate-region (save-excursion (forward-word -1) (point))
+                       (point))
+      (indent-for-tab-command)))
+
+  (local-set-key [tab] 'indent-or-rotate)
+#+END_SRC
+
+** toPug
+#+BEGIN_SRC emacs-lisp
+  (load "~/.emacs.d/lisp/ion.el")
+  ;; (add-to-list 'load-path "/Users/admin/.emacs.d/lisp/js-comint.el")
+  ;; (require 'js-comint)
+  ;; (add-hook 'js2-mode-hook
+  ;;           (lambda ()
+  ;;             (local-set-key (kbd "C-x C-e") 'js-send-last-sexp)
+  ;;             (local-set-key (kbd "C-c b") 'js-send-buffer)
+  ;;             (local-set-key (kbd "C-c C-b") 'js-send-buffer-and-go)))
+#+END_SRC
+
+** visual-regexp-steroids
+#+BEGIN_SRC emacs-lisp
+  (use-package visual-regexp :ensure t)
+  (use-package visual-regexp-steroids :ensure t)
+  (define-key global-map (kbd "C-c r") 'vr/replace)
+  (define-key global-map (kbd "C-c q") 'vr/query-replace)
+  (general-define-key
+    :states 'normal
+    :prefix ","
+    "/r" 'vr/replace
+    "/q" 'vr/query-replace)
+  ;; replace command -- change all at once
+  ;; query command -- ask on every case
+#+END_SRC
+
+** Autocomplete
+#+BEGIN_SRC emacs-lisp
+
+  (use-package company
+    :ensure t
+    :config
+    (setq company-idle-delay 0)
+    (setq company-minimum-prefix-length 3)
+    (global-company-mode t))
+
+  (add-hook 'after-init-hook 'global-company-mode)
+
+#+END_SRC
+
+** change modeline color by state
+#+BEGIN_SRC emacs-lisp
+  ;; change mode-line color by evil state
+    ;; (add-hook 'post-command-hook
+    ;;   (lambda ()
+    ;;     (let ((color (cond ((minibufferp) default-color)
+    ;;                        ((evil-insert-state-p) '("#e80000" . "#ffffff"))
+    ;;                        ((evil-emacs-state-p)  '("#444488" . "#ffffff"))
+    ;;                        ((buffer-modified-p)   '("#006fa0" . "#ffffff"))
+    ;;                        (t default-color))))
+    ;;       (set-face-background 'mode-line (car color))
+    ;;       (set-face-foreground 'mode-line (cdr color)))))
+#+END_SRC
