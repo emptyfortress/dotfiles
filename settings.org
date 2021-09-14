@@ -31,7 +31,7 @@
   (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
   (add-to-list 'default-frame-alist '(ns-appearance . dark))
   (setq ns-use-proxy-icon  nil)
-  (setq frame-title-format nil)
+  ;; (setq frame-title-format nil)
   )
 
 #+END_SRC
@@ -67,47 +67,51 @@
 
 ** Evil
 #+BEGIN_SRC emacs-lisp
-    (use-package evil
-        :ensure t
-        :init
-        (setq evil-want-integration t)
-        (setq evil-want-keybinding nil)
-        (setq evil-vsplit-window-right t)
-        :config
-        (evil-mode 1))
+  (use-package evil
+    :ensure t
+    :init
+    (setq evil-want-integration t)
+    (setq evil-want-keybinding nil)
+    (setq evil-vsplit-window-right t)
+    :config
+    (evil-mode 1))
 
-    (use-package evil-collection
-        :after evil
-        :ensure t
-        :config
-        (evil-collection-init))
+  (use-package evil-collection
+    :after evil
+    :ensure t
+    :custom (evil-collection-setup-minibuffer t)
+    :init
+    (setq evil-want-minibuffer t)
+    :config
+    (evil-collection-init))
 
-    (use-package evil-leader
-        :ensure t
-        :config
-        (global-evil-leader-mode))
 
-    (use-package evil-surround
-        :ensure t
-        :config
-        (global-evil-surround-mode))
+  (use-package evil-leader
+    :ensure t
+    :config
+    (global-evil-leader-mode))
 
-    ;; evil org mode
-    (use-package evil-org
-        :ensure t
-        :after org
-        :config
-        (add-hook 'org-mode-hook 'evil-org-mode)
-        (add-hook 'evil-org-mode-hook
-                (lambda () (evil-org-set-key-theme))))
+  (use-package evil-surround
+    :ensure t
+    :config
+    (global-evil-surround-mode))
 
-    (use-package evil-indent-textobject
-        :ensure t)
+  ;; evil org mode
+  (use-package evil-org
+    :ensure t
+    :after org
+    :config
+    (add-hook 'org-mode-hook 'evil-org-mode)
+    (add-hook 'evil-org-mode-hook
+              (lambda () (evil-org-set-key-theme))))
 
-    (use-package evil-commentary
-        :ensure t
-        :config
-        (evil-commentary-mode))
+  (use-package evil-indent-textobject
+    :ensure t)
+
+  (use-package evil-commentary
+    :ensure t
+    :config
+    (evil-commentary-mode))
 
 #+END_SRC
 
@@ -182,7 +186,7 @@
      ;; left-margin-width 1 right-margin-width 1
      ;; scroll-conservatively most-positive-fixnum
      scroll-conservatively 100000       ; Always scroll by one line
-     scroll-margin 5
+     scroll-margin 3
      scroll-preserve-screen-position 1
      cursor-in-non-selected-windows t)
 
@@ -215,8 +219,8 @@
         "gt" 'org-set-tags-command
         "r" 'org-refile
         "t" 'org-todo
-        ",z" 'my-delete-capture-window
-        "z" 'my-save-and-close
+        ",z" 'org-capture-kill
+        "z" 'org-capture-finalize
         )
 
     (general-define-key
@@ -242,17 +246,18 @@
         :states 'normal
         "RET" 'org-open-at-point)
 
-    (defun my-delete-capture-window ()
-      "Run `org-capture-kill' and `delete-frame' in sequence."
-      (interactive)
-      (org-capture-kill)
-      (delete-frame))
+    ;; (defun my-delete-capture-window ()
+    ;;   "Run `org-capture-kill' and `delete-frame' in sequence."
+    ;;   (interactive)
+    ;;   (org-capture-kill)
+    ;;   (delete-frame))
 
-  (defun my-save-and-close ()
-    "save and close org-capture frame"
-    (interactive)
-    (org-capture-finalize)
-    (delete-frame))
+  ;; (defun my-save-and-close ()
+  ;;   "save and close org-capture frame"
+  ;;   (interactive)
+  ;;   (org-capture-finalize)
+  ;;   (delete-frame))
+
 #+END_SRC
 
 ** Quit minibuffer on escape
@@ -438,6 +443,7 @@
   ;; start capture in insert mode
 
   (add-hook 'org-capture-mode-hook 'evil-insert-state)
+  (add-hook 'org-capture-mode-hook 'toggle-input-method)
 #+END_SRC
 
 ** org-agenda evil bindings
@@ -911,9 +917,16 @@ package show feedback on evil edit code
 
 ** Chrome capture
 #+BEGIN_SRC emacs-lisp
-  (require 'org-capture)
-  (require 'org-protocol)
-  (server-start)
+   (require 'org-capture)
+   (require 'org-protocol)
+   (server-start)
+
+  ; close capture frames when finished capturing
+   (add-hook 'org-capture-after-finalize-hook (lambda () (delete-frame)))
+
+   ; make org-capture open up as sole window in a new frame
+   (add-hook 'server-after-make-frame-hook 'delete-other-windows)
+
 
 #+END_SRC
 ** org-roam
@@ -946,6 +959,7 @@ package show feedback on evil edit code
           deft-recursive t
           deft-auto-save-interval 30.0
           deft-default-extension "org"
+          deft-file-limit 50
           ;; deft-strip-title-regexp "^:PROPERTIES:"
           ;; deft-strip-summary-regexp ":PROPERTIES:\n\\(.+\n\\)+:END:\n"
           ;; deft-use-filter-string-for-filename t
@@ -992,8 +1006,6 @@ package show feedback on evil edit code
 
 #+END_SRC
 
-#+RESULTS:
-
 ** rotate text
 #+BEGIN_SRC emacs-lisp
   (defvar rotate-text-rotations
@@ -1001,8 +1013,9 @@ package show feedback on evil edit code
       ("left" "right" "top" "bottom")
       ("width" "height")
       ("margin" "padding")
+      ("emacs-lisp" "javascript")
       ("pointer" "default" "arrow")
-      ("block" "inline-box" "flex" "inline")
+      ("block" "inline-block" "flex" "inline")
       ("relative" "absolute" "fixed" "static")
       ("yes" "no"))
     "List of text rotation sets.")
@@ -1097,7 +1110,7 @@ package show feedback on evil edit code
                        (point))
       (indent-for-tab-command)))
 
-  (local-set-key [tab] 'indent-or-rotate)
+  ;; (local-set-key [tab] 'indent-or-rotate)
 #+END_SRC
 
 ** toPug
@@ -1153,4 +1166,9 @@ package show feedback on evil edit code
     ;;                        (t default-color))))
     ;;       (set-face-background 'mode-line (car color))
     ;;       (set-face-foreground 'mode-line (cdr color)))))
+#+END_SRC
+
+** which-key
+#+BEGIN_SRC emacs-lisp
+  (use-package which-key)
 #+END_SRC
