@@ -5,7 +5,7 @@
   (defun find-config ()
     "Edit settings.org"
     (interactive)
-    (find-file "~/.emacs.d/settings.org"))
+    (find-file "~/dotfiles/settings.org"))
   (global-set-key (kbd "C-c i") 'find-config)
 #+END_SRC
 
