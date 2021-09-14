@@ -28,10 +28,9 @@ yabai -m config right_padding                10
 yabai -m config window_gap                   06
 
 # rule for org-capture
-yabai -m rule --add app=Emacs manage=on
+yabai -m rule --add app=Emacs manage=off
 # yabai -m rule --add app="Emacs" title="CAPTURE*" space=^5
-# yabai -m rule --add app="Emacs" title="emacs-capture" manage=off space=^5 grid=4:4:1:1:2:2
-# yabai -m rule --add window --focus app="Emacs" title="CAPTURE*"
+# yabai -m rule --add app="Emacs" title="emacs-capture" manage=on space=^5 grid=4:4:1:1:2:2
 # yabai -m rule --add window --focus 
 # yabai -m rule --add window app=Emacs title="^CAPTURE*" --focus app=Emacs title="^CAPTURE*"
 # yabai -m rule --add app=Chrome space=5 native-fullscreen=true
@@ -39,4 +38,5 @@ yabai -m rule --add app=Emacs manage=on
 # yabai -m rule --add app=Emacs space=4 native-fullscreen=true
 # yabai -m rule --add app=iTerm2 space=3 native-fullscreen=true
 yabai -m rule --add app="^Системные настройки$" manage=off
+yabai -m rule --add app=Finder manage=off
 echo "yabai configuration loaded.."

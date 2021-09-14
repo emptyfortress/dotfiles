@@ -32,6 +32,7 @@ Plug 'junegunn/vim-peekaboo'
 Plug 'schickling/vim-bufonly'
 Plug 'SirVer/ultisnips'
 Plug 'wellle/targets.vim'
+Plug 'ThePrimeagen/vim-be-good'
 " Plug 'honza/vim-snippets'
 
 " Initialize plugin system

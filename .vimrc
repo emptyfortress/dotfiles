@@ -24,10 +24,12 @@ Plug 'junegunn/vim-peekaboo'
 Plug 'schickling/vim-bufonly'
 Plug 'SirVer/ultisnips'
 Plug 'wellle/targets.vim'
-
-" Plug 'tomtom/tlib_vim'
-" Plug 'scrooloose/nerdtree'
-
+" Plug 'leafOfTree/vim-vue-plugin'
+Plug 'digitaltoad/vim-pug'
+" Plug 'posva/vim-vue'
+" Plug 'sbdchd/neoformat'
+Plug 'prettier/vim-prettier', { 'do': 'yarn install' }
+Plug 'leafOfTree/vim-vue-plugin'
 
 " Initialize plugin system
 call plug#end()
@@ -39,7 +41,6 @@ call plug#end()
 " PlugStatus	Check the status of plugins
 " PlugDiff	Examine changes from the previous update and the pending changes
 " PlugSnapshot[!] [output path]	Generate script for restoring the current snapshot of the plugins
-
 
 " set encoding, leader and edit vimrc ----------------------------
 scriptencoding utf-8
@@ -53,6 +54,7 @@ set t_Co=256
 syntax enable
 syntax on
 filetype plugin on
+filetype plugin indent on
 set background=dark
 colorscheme gruvbox
 set guifont=Anonymous\ Pro\ for\ Powerline:h18
@@ -82,8 +84,9 @@ set imsearch=0
 highlight lCursor guifg=NONE guibg=Cyan
 
 "keep history in viminfo file and restore cursor postion ----------------------------
+set viminfo=%,'20,/50,:20,h,n~/.viminfo
 " set viminfo='10,\"100,:20,%,n~/.viminfo
-set viminfo='100,<100,:100,%,f50,s50,h
+" set viminfo='100,<100,:100,f50,s50,h
 "jump to last known positions
 function! ResCur()
   if line("'\"") <= line("$")
@@ -107,11 +110,15 @@ set wildignore=*.swp,*.bak,*.pyc,*.class
 set title                " change the terminal's title
 set visualbell           " don't beep
 set noerrorbells         " don't beep
+set autoread             "Reload files changed outside vim
 
 
 " save all buffers
 noremap \g  :wa<Cr>      
 noremap <leader>w :w<Cr>
+noremap <leader><space> :Prettier<Cr>
+
+" noremap <leader>w :Prettier<Cr>:w<Cr>
 " set cc=80                   " set an 80 column border for good coding style
 
 "set key bindings for quick window movement----------------------------
@@ -155,9 +162,9 @@ nnoremap <leader>. :lcd %:p:h<CR>
 :nnoremap g# g#zz
 
 " quick jump in insert mode
-inoremap II <esc>I
-inoremap AA <esc>A
-inoremap OO <esc>O
+" inoremap II <esc>I
+" inoremap AA <esc>A
+" inoremap OO <esc>O
 
 " open help in vertical split
 " :vert he topic
@@ -335,6 +342,11 @@ nnoremap <silent><nowait> <space>p  :<C-u>CocListResumeCR>
 
 " Coc-prettier --------------------
 command! -nargs=0 Prettier :CocCommand prettier.formatFile
+
+" autocmd BufWritePre *.vue Prettier
+" autocmd BufWritePre *.ts Prettier
+vmap <localleader>f  <Plug>(coc-format-selected)
+nmap <localleader>f  <Plug>(coc-format-selected)
 " coc end
 "
 "
@@ -383,14 +395,16 @@ let FZF_DEFAULT_COMMAND='ag -g ""'
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "  this is remove lag and syntax hi for vue files and commenting  "
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" autocmd FileType vue syntax sync fromstart
-" let g:vue_disable_pre_processors=1
+autocmd FileType vue syntax sync fromstart
+" let g:vue_pre_processors = []
+let g:vue_disable_pre_processors=1
 " let g:vue_pre_processors = ['pug']
-" " let g:vue_pre_processors = 'detect_on_enter'
+" let g:vue_pre_processors = 'detect_on_enter'
 " filetype plugin on
 " syntax on
 " autocmd FileType vue syntax sync fromstart
 " ничего не работает как надо. забил пока. Комменты в pug кастомные
+
 nnoremap gch :TCommentAs pug<cr>
 
 
@@ -456,16 +470,19 @@ nmap <leader><leader>s <Plug>(easymotion-s2)
 let g:switch_custom_definitions =
 		\ [
 		\		['bottom', 'top', 'left', 'right'], 
-    \   ['margin', 'padding'], [ 'this', 'that' ], 
+    \   ['margin', 'padding'], [ 'this', 'that' ], ['bold', 'normal'],
     \   ['width', 'height'], ['front', 'back'],
     \   ['space-between', 'center', 'space-around'],
+    \   ['relative', 'absolute', 'fixed'],
+		\   ['methods', 'components', 'computed'],
 		\		{
-		\			'#\(.*\)#$': '//\1',
-		\			'//\(.*\)$': '/\*\1\*/',
-		\			'/\*\(.*\)\*/$': '<!--\1-->',
-		\			'<!--\(.*\)-->$': '-\1-',
-		\			'-\(.*\)-$': '#\1#'
+		\ 		'<!--\(.*\)-->$': '//-\1',
+		\			'//-\(.*\)$': '<!--\1 -->'
 		\		},
+		\		{
+		\	  	'\"\(.*\)\"': "\'\\1\'",
+		\     '''\(.*\)''': '"\1"'
+		\		}
 		\ ]
 
 " move lines up and down
@@ -477,21 +494,14 @@ vnoremap ∆ :m '>+1<CR>gv=gv
 vnoremap ˚ :m '<-2<CR>gv=gv
 
 " fasd 
-" function! s:fasd_update() abort
-"   if empty(&buftype) || &filetype ==# 'dirvish'
-"     call jobstart(['fasd', '-A', expand('%:p')])
-"   endif
-" endfunction
-" augroup fasd
-"   autocmd!
-"   autocmd BufWinEnter,BufFilePost * call s:fasd_update()
-" augroup END
-command! FASD call fzf#run(fzf#wrap({'source': 'fasd -al', 'options': '--no-sort --tac --tiebreak=index'}))
-nnoremap <silent> <Leader>ef :FASD<CR>
+" command! FASD call fzf#run(fzf#wrap({'source': 'fasd -al', 'options': '--no-sort --tac --tiebreak=index'}))
+autocmd BufReadPost * silent call system('fasd -A '.expand('%'))
+command! FASDF call fzf#run(fzf#wrap({'source': 'fasd -al -e -R', 'options': '--no-sort --tac --tiebreak=index'}))
+nnoremap <silent> <leader>ef :FASDF<CR>
 
-"another fasd ==============================================
-" command! FASD call fzf#run(fzf#wrap({'source': 'fasd -d -R', 'sink': { line -> execute('cd '.split(line)[-1]) }}))
-" nnoremap <silent> <leader>ef :FASD<CR>
+"fasd open directory in Ex ==============================================
+command! FASD call fzf#run(fzf#wrap({'source': 'fasd -d -R', 'sink': { line -> execute('Ex '.split(line)[-1]) }}))
+nnoremap <silent> <leader>ed :FASD<CR>
 
 " set working directory
 nnoremap <leader>. :lcd %:p:h<cr>
@@ -511,7 +521,40 @@ let g:UltiSnipsExpandTrigger="<c-k>"
 let g:UltiSnipsJumpForwardTrigger="<c-n>"
 let g:UltiSnipsJumpBackwardTrigger="<c-p>"
 let g:UltiSnipsEditSplit="vertical"
-let g:UltiSnipsSnippetsDir="~/.config/nvim/UltiSnips/"
+let g:UltiSnipsSnippetsDir="~/.vim/UltiSnips/"
 
 " copy in system register
 nmap <localleader>y "+y
+vmap <localleader>y "+y
+
+" break line in normal mode
+" :nnoremap <NL> i<CR><ESC>
+"
+" disable coc in css
+autocmd FileType scss let b:coc_suggest_disable = 1
+autocmd FileType css let b:coc_suggest_disable = 1
+" autocmd FileType scss :call CocDisable()
+" autocmd FileType css :call CocDisable()
+"
+set shortmess-=S  "show number of results in search
+
+" let g:prettier#autoformat_require_pragma = 0
+" let g:prettier#autoformat_config_present = 1
+" nnoremap gp :silent %!prettier --stdin-filepath %<CR>
+" let g:prettier#config#single_quote = 'true'
+" let g:prettier#config#trailing_comma = 'all'	
+"
+" vim-vue-plugin
+let g:vim_vue_plugin_config = { 
+      \'syntax': {
+      \   'template': ['html', 'pug'],
+      \   'script': ['javascript', 'typescript' ],
+      \   'style': ['scss'],
+      \   'route': 'json',
+      \},
+      \'full_syntax': ['scss', 'html'],
+      \'initial_indent': [],
+      \'attribute': 1,
+      \'keyword': 1,
+      \'foldexpr': 1,
+      \}
