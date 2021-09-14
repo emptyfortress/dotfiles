@@ -1,2 +1,2 @@
 # dotfiles
-my config files (vim, nvim, vifm, zsh, skhdrc, yabairc)
+my config files (vim, nvim, emacs, vifm, zsh, skhdrc, yabairc)
