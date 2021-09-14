@@ -4,7 +4,7 @@ yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
 
 # global settings
 yabai -m config mouse_follows_focus          on
-yabai -m config focus_follows_mouse          off
+yabai -m config focus_follows_mouse          on
 yabai -m config window_placement             second_child
 yabai -m config window_topmost               on
 yabai -m config window_opacity               on
@@ -29,8 +29,7 @@ yabai -m config window_gap                   06
 
 # rule for org-capture
 yabai -m rule --add app=Emacs manage=off
-# yabai -m rule --add app="Emacs" title="CAPTURE*" space=^5
-# yabai -m rule --add app="Emacs" title="emacs-capture" manage=on space=^5 grid=4:4:1:1:2:2
+yabai -m rule --add app="Emacs" title="CAPTURE-inbox.org" space=^5 grid=6:6:4:1:2:2
 # yabai -m rule --add window --focus 
 # yabai -m rule --add window app=Emacs title="^CAPTURE*" --focus app=Emacs title="^CAPTURE*"
 # yabai -m rule --add app=Chrome space=5 native-fullscreen=true
