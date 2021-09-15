@@ -219,7 +219,7 @@
         "gt" 'org-set-tags-command
         "r" 'org-refile
         "t" 'org-todo
-        ",z" 'org-capture-kill
+        ",z" 'my-delete-capture-window
         "z" 'org-capture-finalize
         )
 
@@ -246,11 +246,11 @@
         :states 'normal
         "RET" 'org-open-at-point)
 
-    ;; (defun my-delete-capture-window ()
-    ;;   "Run `org-capture-kill' and `delete-frame' in sequence."
-    ;;   (interactive)
-    ;;   (org-capture-kill)
-    ;;   (delete-frame))
+    (defun my-delete-capture-window ()
+      "Run `org-capture-kill' and `delete-frame' in sequence."
+      (interactive)
+      (org-capture-kill)
+      (delete-frame))
 
   ;; (defun my-save-and-close ()
   ;;   "save and close org-capture frame"
@@ -925,8 +925,13 @@ package show feedback on evil edit code
    (add-hook 'org-capture-after-finalize-hook (lambda () (delete-frame)))
 
    ; make org-capture open up as sole window in a new frame
-   (add-hook 'server-after-make-frame-hook 'delete-other-windows)
+  (defun run-capture-hooks ()
+  "Run all the following functions in the hook"
+  (delete-other-windows)
+  (set-frame-font "Input-18:antialiasing=false")
+  )
 
+  (add-hook 'server-after-make-frame-hook #'run-capture-hooks)
 
 #+END_SRC
 ** org-roam

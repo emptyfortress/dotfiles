@@ -29,13 +29,14 @@ yabai -m config window_gap                   06
 
 # rule for org-capture
 yabai -m rule --add app=Emacs manage=off
-yabai -m rule --add app="Emacs" title="CAPTURE-inbox.org" space=^5 grid=6:6:4:1:2:2
-# yabai -m rule --add window --focus 
-# yabai -m rule --add window app=Emacs title="^CAPTURE*" --focus app=Emacs title="^CAPTURE*"
-# yabai -m rule --add app=Chrome space=5 native-fullscreen=true
-# yabai -m rule --add app="Microsoft Teams" space=7 native-fullscreen=true
-# yabai -m rule --add app=Emacs space=4 native-fullscreen=true
-# yabai -m rule --add app=iTerm2 space=3 native-fullscreen=true
+yabai -m rule --add app="Emacs" title="CAPTURE-inbox.org" space=^5 grid=10:6:3:1:7:2
+# focus capture window
+yabai -m signal --add event=window_created action="yabai -m window --focus \$(yabai -m query --windows --space | jq .[0].id)"
+# focus window after active space changes
+yabai -m signal --add event=space_changed action="yabai -m window --focus \$(yabai -m query --windows --space | jq .[0].id)"
+# focus window after active display changes
+yabai -m signal --add event=display_changed action="yabai -m window --focus \$(yabai -m query --windows --space | jq .[0].id)"
+
 yabai -m rule --add app="^Системные настройки$" manage=off
 yabai -m rule --add app=Finder manage=off
 echo "yabai configuration loaded.."
