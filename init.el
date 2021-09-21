@@ -36,7 +36,7 @@
  '(custom-safe-themes
    '("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "d14f3df28603e9517eb8fb7518b662d653b25b26e83bd8e129acea042b774298" default))
  '(package-selected-packages
-   '(which-key zetteldeft deft company visual-regexp-steroids visual-regexp emojify olivetti lsp-ivy lsp-ui exec-path-from-shell lsp-mode vue-mode yasnippet evil-vimish-fold vimish-fold ace-window evil-goggles evil-numbers diminish smart-mode-line-powerline-theme avy org-plus-contrib counsel-projectile projectile magit ivy-hydra counsel ivy smex ranger drag-stuff general evil gruvbox-theme use-package)))
+   '(lorem-ipsum pug-mode elfeed org-download which-key zetteldeft deft company visual-regexp-steroids visual-regexp emojify olivetti lsp-ivy lsp-ui exec-path-from-shell lsp-mode vue-mode yasnippet evil-vimish-fold vimish-fold ace-window evil-goggles evil-numbers diminish smart-mode-line-powerline-theme avy org-plus-contrib counsel-projectile projectile magit ivy-hydra counsel ivy smex ranger drag-stuff general evil gruvbox-theme use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -53,3 +53,4 @@
  '(org-scheduled-previously ((t (:foreground "#ff00cc"))))
  '(region ((t (:background "#94765A"))))
  '(secondary-selection ((t (:background "#836D62" :foreground "black")))))
+(put 'narrow-to-region 'disabled nil)

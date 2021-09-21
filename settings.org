@@ -142,6 +142,7 @@
 	      "w" 'save-buffer
 	      "v" 'evil-window-vsplit
 	      "o" 'delete-other-windows
+	      ",o" 'olivetti-mode
 	      "k" 'kill-current-buffer
 	      "s" 'avy-goto-word-1
 	      "e" 'avy-goto-char-timer
@@ -710,6 +711,7 @@ package show feedback on evil edit code
 
 ** JScript
 #+BEGIN_SRC emacs-lisp
+
   (use-package js
     :ensure nil
     :delight js-mode "JavaScript"
@@ -1120,14 +1122,17 @@ package show feedback on evil edit code
 
 ** toPug
 #+BEGIN_SRC emacs-lisp
+
   (load "~/.emacs.d/lisp/ion.el")
-  ;; (add-to-list 'load-path "/Users/admin/.emacs.d/lisp/js-comint.el")
-  ;; (require 'js-comint)
-  ;; (add-hook 'js2-mode-hook
-  ;;           (lambda ()
-  ;;             (local-set-key (kbd "C-x C-e") 'js-send-last-sexp)
-  ;;             (local-set-key (kbd "C-c b") 'js-send-buffer)
-  ;;             (local-set-key (kbd "C-c C-b") 'js-send-buffer-and-go)))
+  (add-to-list 'load-path "/Users/admin/.emacs.d/lisp/js-comint.el")
+  (require 'js-comint)
+
+  (add-hook 'js-mode-hook
+            (lambda ()
+              (local-set-key (kbd "C-x C-e") 'js-send-last-sexp)
+              (local-set-key (kbd "C-c b") 'js-send-buffer)
+              (local-set-key (kbd "C-c C-b") 'js-send-buffer-and-go)))
+
 #+END_SRC
 
 ** visual-regexp-steroids
@@ -1159,21 +1164,45 @@ package show feedback on evil edit code
 
 #+END_SRC
 
-** change modeline color by state
-#+BEGIN_SRC emacs-lisp
-  ;; change mode-line color by evil state
-    ;; (add-hook 'post-command-hook
-    ;;   (lambda ()
-    ;;     (let ((color (cond ((minibufferp) default-color)
-    ;;                        ((evil-insert-state-p) '("#e80000" . "#ffffff"))
-    ;;                        ((evil-emacs-state-p)  '("#444488" . "#ffffff"))
-    ;;                        ((buffer-modified-p)   '("#006fa0" . "#ffffff"))
-    ;;                        (t default-color))))
-    ;;       (set-face-background 'mode-line (car color))
-    ;;       (set-face-foreground 'mode-line (cdr color)))))
-#+END_SRC
-
 ** which-key
 #+BEGIN_SRC emacs-lisp
   (use-package which-key)
+#+END_SRC
+
+** org-download
+#+BEGIN_SRC emacs-lisp
+  (use-package org-download
+  :after org)
+
+  (general-define-key
+    :keymaps 'org-mode-map
+    :states '(normal visual)
+    "C-c y" '(org-download-clipboard :which-key "org-download-clipboard"))
+  (add-hook 'dired-mode-hook 'org-download-enable)
+#+END_SRC
+
+** elfeed
+#+BEGIN_SRC emacs-lisp
+  (use-package elfeed)
+
+  (setq elfeed-feeds
+        '("http://nullprogram.com/feed/"
+          "https://d12frosted.io/atom.xml"
+          "https://css-tricks.com/feed/"
+          "https://tympanus.net/codrops/feed/"
+          "https://alistapart.com/site/rss"
+          "https://www.smashingmagazine.com/feed"
+          "https://www.sitepoint.com/feed/"
+          "https://vc.ru/rss"
+          "https://meduza.io/rss2/all"
+          "https://russia-insider.com/en/all-content/rss"
+          "https://planet.emacslife.com/atom.xml"))
+
+  (add-hook 'elfeed-show-mode-hook 'olivetti-mode)
+
+#+END_SRC
+
+** pug-mode
+#+BEGIN_SRC emacs-lisp
+  (use-package pug-mode)
 #+END_SRC
