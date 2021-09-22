@@ -79,9 +79,9 @@
   (use-package evil-collection
     :after evil
     :ensure t
-    :custom (evil-collection-setup-minibuffer t)
-    :init
-    (setq evil-want-minibuffer t)
+    ;; :custom (evil-collection-setup-minibuffer t)
+    ;; :init
+    ;; (setq evil-want-minibuffer t)
     :config
     (evil-collection-init))
 
@@ -133,55 +133,55 @@
 
 ** Main evil keybindings
 #+BEGIN_SRC emacs-lisp
-	  (general-define-key "M-o" 'other-window)
-	  (evil-leader/set-leader ",")
+          (general-define-key "M-o" 'other-window)
+          (evil-leader/set-leader ",")
 
-	  (evil-leader/set-key
-	      "f" 'projectile-command-map
-	      "R" 'counsel-projectile-rg
-	      "w" 'save-buffer
-	      "v" 'evil-window-vsplit
-	      "o" 'delete-other-windows
-	      ",o" 'olivetti-mode
-	      "k" 'kill-current-buffer
-	      "s" 'avy-goto-word-1
-	      "e" 'avy-goto-char-timer
-	      "l" 'avy-goto-line
-	      "b" 'ivy-switch-buffer
-	      "D" 'deer
-	      ",b" 'bookmark-jump
-	      ",v" 'vue-mode-reparse
-	      "c" 'org-capture
-	      "." 'org-time-stamp
-	      "a" 'org-agenda
-	      "gr" 'my-revert-buffer
-	      "gs" 'magit-status)
+          (evil-leader/set-key
+              "f" 'projectile-command-map
+              "R" 'counsel-projectile-rg
+              "w" 'save-buffer
+              "v" 'evil-window-vsplit
+              "o" 'delete-other-windows
+              ",o" 'olivetti-mode
+              "k" 'kill-current-buffer
+              "s" 'avy-goto-word-1
+              "e" 'avy-goto-char-timer
+              "l" 'avy-goto-line
+              ;; "b" 'ivy-switch-buffer
+              "D" 'deer
+              ",b" 'bookmark-jump
+              ",v" 'vue-mode-reparse
+              "c" 'org-capture
+              "." 'org-time-stamp
+              "a" 'org-agenda
+              "gr" 'my-revert-buffer
+              "gs" 'magit-status)
 
-	  (defun my-revert-buffer ()
-	    "Reload file from disk"
-	    (interactive)
-	    (revert-buffer t (not (buffer-modified-p)) t))
+          (defun my-revert-buffer ()
+            "Reload file from disk"
+            (interactive)
+            (revert-buffer t (not (buffer-modified-p)) t))
 
-	  (define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
-	  (define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line)
+          (define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
+          (define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line)
 
-	;; swap ;: for better experience
-	(general-swap-key nil 'motion
-	  ";" ":")
+        ;; swap ;: for better experience
+        (general-swap-key nil 'motion
+          ";" ":")
 
       ;; remap find next char and reverse
 
-	  (general-define-key
-	  :states 'normal
-	  "SPC" 'evil-repeat-find-char)
+          (general-define-key
+          :states 'normal
+          "SPC" 'evil-repeat-find-char)
 
-	  (general-define-key
-	  :states 'normal
-	    "DEL" 'evil-repeat-find-char-reverse)
+          (general-define-key
+          :states 'normal
+            "DEL" 'evil-repeat-find-char-reverse)
 
-	  (general-define-key
-	  :states 'insert
-	    "C-h" 'delete-backward-char)
+          (general-define-key
+          :states 'insert
+            "C-h" 'delete-backward-char)
     ;; scrolling
     (setq-default
      ;; left-margin-width 1 right-margin-width 1
@@ -280,43 +280,43 @@
 
 ** ivy swiper counsel
 #+BEGIN_SRC emacs-lisp
-  (use-package smex ;; smart M-x
-    :ensure t)
+  ;; (use-package smex ;; smart M-x
+  ;;   :ensure t)
 
-  (use-package ivy
-    :ensure t
-    :diminish ivy-mode
-    :config
-    (ivy-mode t))
+  ;; (use-package ivy
+  ;;   :ensure t
+  ;;   :diminish ivy-mode
+  ;;   :config
+  ;;   (ivy-mode t))
 
-  (setq ivy-initial-inputs-alist nil)
-  (setq ivy-use-virtual-buffers t)       ; extend searching to bookmarks and
-  (setq ivy-height 20)                   ; set height of the ivy window
-  (setq ivy-count-format "(%d/%d) ")     ; count format, from the ivy help page
-  (setq ivy-display-style 'fancy)
-  (setq ivy-format-function 'ivy-format-function-line) ; Make highlight extend all the way to the right
+  ;; (setq ivy-initial-inputs-alist nil)
+  ;; (setq ivy-use-virtual-buffers t)       ; extend searching to bookmarks and
+  ;; (setq ivy-height 20)                   ; set height of the ivy window
+  ;; (setq ivy-count-format "(%d/%d) ")     ; count format, from the ivy help page
+  ;; (setq ivy-display-style 'fancy)
+  ;; (setq ivy-format-function 'ivy-format-function-line) ; Make highlight extend all the way to the right
   ;; TODO testing out the fuzzy search
-  (setq ivy-re-builders-alist
-        '((counsel-M-x . ivy--regex-fuzzy) ; Only counsel-M-x use flx fuzzy search
-          (t . ivy--regex-plus)))
+  ;; (setq ivy-re-builders-alist
+  ;;       '((counsel-M-x . ivy--regex-fuzzy) ; Only counsel-M-x use flx fuzzy search
+  ;;         (t . ivy--regex-plus)))
 
-  (use-package counsel
-    :ensure t
-    :bind (("M-x" . counsel-M-x)))
+  ;; (use-package counsel
+  ;;   :ensure t
+  ;;   :bind (("M-x" . counsel-M-x)))
 
-  (general-define-key
-   :states '(normal visual)
-   :prefix ","
-   "x" '(counsel-M-x :which-key "mycounsel"))
+  ;; (general-define-key
+  ;;  :states '(normal visual)
+  ;;  :prefix ","
+  ;;  "x" '(counsel-M-x :which-key "mycounsel"))
 
-  (use-package swiper
-    :ensure t)
-  (general-define-key
-   :states '(normal visual)
-   "/" '(swiper :which-key "swiper"))
+  ;; (use-package swiper
+  ;;   :ensure t)
+  ;; (general-define-key
+  ;;  :states '(normal visual)
+  ;;  "/" '(swiper :which-key "swiper"))
 
-  (use-package ivy-hydra
-    :ensure t)
+  ;; (use-package ivy-hydra
+  ;;   :ensure t)
 
 #+END_SRC
 
@@ -840,7 +840,7 @@ package show feedback on evil edit code
   :custom
   (lsp-ui-doc-position 'bottom))
 
-  (use-package lsp-ivy)
+  ;; (use-package lsp-ivy)
 
 #+END_SRC
 
@@ -1153,14 +1153,14 @@ package show feedback on evil edit code
 ** Autocomplete
 #+BEGIN_SRC emacs-lisp
 
-  (use-package company
-    :ensure t
-    :config
-    (setq company-idle-delay 0)
-    (setq company-minimum-prefix-length 3)
-    (global-company-mode t))
+  ;; (use-package company
+  ;;   :ensure t
+  ;;   :config
+  ;;   (setq company-idle-delay 0)
+  ;;   (setq company-minimum-prefix-length 3)
+  ;;   (global-company-mode t))
 
-  (add-hook 'after-init-hook 'global-company-mode)
+  ;; (add-hook 'after-init-hook 'global-company-mode)
 
 #+END_SRC
 
@@ -1205,4 +1205,226 @@ package show feedback on evil edit code
 ** pug-mode
 #+BEGIN_SRC emacs-lisp
   (use-package pug-mode)
+#+END_SRC
+
+** vertico
+#+BEGIN_SRC emacs-lisp
+
+  (use-package vertico
+  :ensure t
+  :bind (
+         :map vertico-map
+         ("C-j" . vertico-next)
+         ("C-k" . vertico-previous)
+         ("C-g" . vertico-last)
+         :map minibuffer-local-map
+         ("M-h" . backward-kill-word))
+  :custom
+  (vertico-cycle t)
+  :init
+  (vertico-mode))
+
+  (use-package orderless
+  :init
+  (setq completion-styles '(orderless)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles partial-completion)))))
+
+  (use-package savehist
+  :init
+  (savehist-mode))
+
+  (use-package marginalia
+  :after vertico
+  :ensure t
+  :custom
+  (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
+  :init
+  (marginalia-mode))
+
+
+#+END_SRC
+
+# ** consult
+# #+BEGIN_SRC emacs-lisp
+#   ;; Example configuration for Consult
+# (use-package consult
+#   ;; Replace bindings. Lazily loaded due by `use-package'.
+#   :bind (;; C-c bindings (mode-specific-map)
+#          ("C-c h" . consult-history)
+#          ("C-c m" . consult-mode-command)
+#          ("C-c b" . consult-bookmark)
+#          ("C-c k" . consult-kmacro)
+#          ;; C-x bindings (ctl-x-map)
+#          ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+#          ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
+#          ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+#          ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+#          ;; Custom M-# bindings for fast register access
+#          ("M-#" . consult-register-load)
+#          ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+#          ("C-M-#" . consult-register)
+#          ;; Other custom bindings
+#          ("M-y" . consult-yank-pop)                ;; orig. yank-pop
+#          ("<help> a" . consult-apropos)            ;; orig. apropos-command
+#          ;; M-g bindings (goto-map)
+#          ("M-g e" . consult-compile-error)
+#          ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+#          ("M-g g" . consult-goto-line)             ;; orig. goto-line
+#          ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
+#          ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+#          ("M-g m" . consult-mark)
+#          ("M-g k" . consult-global-mark)
+#          ("M-g i" . consult-imenu)
+#          ("M-g I" . consult-imenu-multi)
+#          ;; M-s bindings (search-map)
+#          ("M-s f" . consult-find)
+#          ("M-s F" . consult-locate)
+#          ("M-s g" . consult-grep)
+#          ("M-s G" . consult-git-grep)
+#          ("M-s r" . consult-ripgrep)
+#          ("M-s l" . consult-line)
+#          ("M-s L" . consult-line-multi)
+#          ("M-s m" . consult-multi-occur)
+#          ("M-s k" . consult-keep-lines)
+#          ("M-s u" . consult-focus-lines)
+#          ;; Isearch integration
+#          ("M-s e" . consult-isearch)
+#          :map isearch-mode-map
+#          ("M-e" . consult-isearch)                 ;; orig. isearch-edit-string
+#          ("M-s e" . consult-isearch)               ;; orig. isearch-edit-string
+#          ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+#          ("M-s L" . consult-line-multi))           ;; needed by consult-line to detect isearch
+
+#   ;; Enable automatic preview at point in the *Completions* buffer.
+#   ;; This is relevant when you use the default completion UI,
+#   ;; and not necessary for Vertico, Selectrum, etc.
+#   :hook (completion-list-mode . consult-preview-at-point-mode)
+
+#   ;; The :init configuration is always executed (Not lazy)
+#   :init
+
+#   ;; Optionally configure the register formatting. This improves the register
+#   ;; preview for `consult-register', `consult-register-load',
+#   ;; `consult-register-store' and the Emacs built-ins.
+#   (setq register-preview-delay 0
+#         register-preview-function #'consult-register-format)
+
+#   ;; Optionally tweak the register preview window.
+#   ;; This adds thin lines, sorting and hides the mode line of the window.
+#   (advice-add #'register-preview :override #'consult-register-window)
+
+#   ;; Optionally replace `completing-read-multiple' with an enhanced version.
+#   (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
+
+#   ;; Use Consult to select xref locations with preview
+#   (setq xref-show-xrefs-function #'consult-xref
+#         xref-show-definitions-function #'consult-xref)
+
+#   ;; Configure other variables and modes in the :config section,
+#   ;; after lazily loading the package.
+#   :config
+
+#   ;; Optionally configure preview. The default value
+#   ;; is 'any, such that any key triggers the preview.
+#   ;; (setq consult-preview-key 'any)
+#   ;; (setq consult-preview-key (kbd "M-."))
+#   ;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
+#   ;; For some commands and buffer sources it is useful to configure the
+#   ;; :preview-key on a per-command basis using the `consult-customize' macro.
+#   (consult-customize
+#    consult-theme
+#    :preview-key '(:debounce 0.2 any)
+#    consult-ripgrep consult-git-grep consult-grep
+#    consult-bookmark consult-recent-file consult-xref
+#    consult--source-file consult--source-project-file consult--source-bookmark
+#    :preview-key (kbd "M-."))
+
+#   ;; Optionally configure the narrowing key.
+#   ;; Both < and C-+ work reasonably well.
+#   (setq consult-narrow-key "<") ;; (kbd "C-+")
+
+#   ;; Optionally make narrowing help available in the minibuffer.
+#   ;; You may want to use `embark-prefix-help-command' or which-key instead.
+#   ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
+
+#   ;; Optionally configure a function which returns the project root directory.
+#   ;; There are multiple reasonable alternatives to chose from.
+#   ;;;; 1. project.el (project-roots)
+#   (setq consult-project-root-function
+#         (lambda ()
+#           (when-let (project (project-current))
+#             (car (project-roots project)))))
+#   ;;;; 2. projectile.el (projectile-project-root)
+#   ;; (autoload 'projectile-project-root "projectile")
+#   ;; (setq consult-project-root-function #'projectile-project-root)
+#   ;;;; 3. vc.el (vc-root-dir)
+#   ;; (setq consult-project-root-function #'vc-root-dir)
+#   ;;;; 4. locate-dominating-file
+#   ;; (setq consult-project-root-function (lambda () (locate-dominating-file "." ".git")))
+# )
+
+# #+END_SRC
+
+** corfu
+#+BEGIN_SRC emacs-lisp
+
+    (use-package corfu
+    ;; Optional customizations
+    :custom
+    (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+    (corfu-auto t)                 ;; Enable auto completion
+    (corfu-commit-predicate nil)   ;; Do not commit selected candidates on next input
+    (corfu-quit-at-boundary t)     ;; Automatically quit at word boundary
+    (corfu-quit-no-match t)        ;; Automatically quit if there is no match
+    (corfu-echo-documentation nil) ;; Do not show documentation in the echo area
+
+    ;; Optionally use TAB for cycling, default is `corfu-complete'.
+    ;; :bind (:map corfu-map
+    ;;        ("TAB" . corfu-next)
+    ;;        ([tab] . corfu-next)
+    ;;        ("S-TAB" . corfu-previous)
+    ;;        ([backtab] . corfu-previous))
+
+    ;; You may want to enable Corfu only for certain modes.
+    ;; :hook ((prog-mode . corfu-mode)
+    ;;        (shell-mode . corfu-mode)
+    ;;        (eshell-mode . corfu-mode))
+
+    ;; Recommended: Enable Corfu globally.
+    ;; This is recommended since dabbrev can be used globally (M-/).
+    :init
+    (corfu-global-mode))
+
+    ;; Optionally use the `orderless' completion style.
+  ;; Enable `partial-completion' for files to allow path expansion.
+  ;; You may prefer to use `initials' instead of `partial-completion'.
+  (use-package orderless
+    :init
+    (setq completion-styles '(orderless)
+          completion-category-defaults nil
+          completion-category-overrides '((file (styles . (partial-completion))))))
+
+  ;; Dabbrev works with Corfu
+  (use-package dabbrev
+    ;; Swap M-/ and C-M-/
+    :bind (("M-/" . dabbrev-completion)
+           ("C-M-/" . dabbrev-expand)))
+
+
+    (use-package emacs
+    :init
+    ;; TAB cycle if there are only few candidates
+    (setq completion-cycle-threshold 3)
+
+    ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
+    ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
+    ;; (setq read-extended-command-predicate
+    ;;       #'command-completion-default-include-p)
+
+    ;; Enable indentation+completion using the TAB key.
+    ;; `completion-at-point' is often bound to M-TAB.
+    (setq tab-always-indent 'complete))
+  (setq)
+
 #+END_SRC
