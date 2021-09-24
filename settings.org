@@ -1010,12 +1010,12 @@ package show feedback on evil edit code
   (general-define-key
    :states 'insert
    :keymaps 'deft-mode-map
-   "C-n" 'evil-next-visual-line)
+   "C-j" 'evil-next-visual-line)
 
   (general-define-key
    :states 'insert
    :keymaps 'deft-mode-map
-   "C-p" 'evil-previous-visual-line)
+   "C-k" 'evil-previous-visual-line)
 
   (use-package zetteldeft
     :ensure t
