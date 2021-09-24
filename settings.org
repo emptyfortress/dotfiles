@@ -142,14 +142,16 @@
               "w" 'save-buffer
               "v" 'evil-window-vsplit
               "o" 'delete-other-windows
-              ",o" 'olivetti-mode
+              ",o" 'consult-outline
+              "O" 'olivetti-mode
               "k" 'kill-current-buffer
               "s" 'avy-goto-word-1
               "e" 'avy-goto-char-timer
               "l" 'avy-goto-line
-              ;; "b" 'ivy-switch-buffer
+              "b" 'consult-buffer
+              "B" 'consult-buffer-other-window
+              ",b" 'consult-bookmark
               "D" 'deer
-              ",b" 'bookmark-jump
               ",v" 'vue-mode-reparse
               "c" 'org-capture
               "." 'org-time-stamp
@@ -393,16 +395,16 @@
      )
 
    (setq org-capture-templates `(
-                                 ("i" "Inbox" entry (file inbox) ,inbox-capture-template)
-                                 ("t" "Inbox [TODO]" entry (file inbox) ,todo-capture-template)
+                                 ("i" "Inbox" entry (file+headline inbox "Inbox") ,inbox-capture-template)
+                                 ("t" "Inbox [TODO]" entry (file+headline inbox "Inbox") ,todo-capture-template)
                                  ("T" "Tickler" entry (file+headline tickler "Tickler") ,tickler-capture-template)
                                  ("f" "Foo" entry (file+headline foo "ideas") "* FOO %i%?")
                                  ;; ("k" "Keys" entry (file+headline keys "Keys") ,keys-capture-template)
                                  ("n" "Note" entry (file ref) ,inbox-capture-template)
                                  ("j" "Journal" entry (file+olp+datetree "~/Develop/org/journal.org") "**** %<%H:%M> - %?\n%a\n" :tree-type week)
-                                 ("p" "Protocol" entry (file inbox)
+                                 ("p" "Protocol" entry (file+headline inbox "Inbox")
                                        "* %?\n%u\n\n%a\n \n%i\n")
-                                 ("L" "Link" entry (file inbox)
+                                 ("L" "Link" entry (file+headline inbox "Inbox")
                                   "* [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n%? \n\n%u")
                                  ("m" "Meeting" entry (file inbox)
                                   "* MEETING with %? :MEETING:\n%U\n\n" :clock-in t :clock-resume t)
@@ -615,7 +617,7 @@ package show feedback on evil edit code
 
   (general-define-key
    :states 'normal
-   "M-C-y" 'counsel-yank-pop)
+   "M-C-y" 'consult-yank-pop)
 
 #+END_SRC
 
@@ -735,19 +737,6 @@ package show feedback on evil edit code
 ** Vue
 #+BEGIN_SRC emacs-lisp
 
-  ;; (use-package vue-mode
-  ;;   :ensure t)
-  ;;   (add-hook 'vue-mode-hook
-  ;;             (lambda ()
-  ;;               (set-face-background 'mmm-default-submode-face nil)))
-  ;;   (electric-pair-mode 1)
-  ;;   ;; (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
-  ;;   ;; (add-hook 'vue-mode-hook 'prettier-mode t)
-  ;;   (add-hook 'vue-mode-hook (lambda() (display-line-numbers-mode 1)))
-  ;;   (global-set-key (kbd "C-c C-e") 'vue-mode-edit-indirect-at-point)
-  ;;   (add-to-list 'write-file-functions 'delete-trailing-whitespace)
-
-
   (use-package vue-mode
     :ensure t)
 
@@ -755,10 +744,14 @@ package show feedback on evil edit code
     (display-line-numbers-mode 1)
     (setq mmm-submode-decoration-level 0)
     (prettier-mode 1)
-    (global-set-key (kbd "C-c C-v") 'vue-mode-reparse)
     (global-set-key (kbd "C-c C-e") 'vue-mode-edit-indirect-at-point)
     (add-to-list 'write-file-functions 'delete-trailing-whitespace)
-    )
+
+    (general-define-key
+          :states '(normal visual)
+          :keymaps 'vue-mode-map
+          :prefix ","
+          ",v" 'vue-mode-reparse))
 
   (add-hook 'vue-mode-hook 'vuejs-custom)
 
@@ -771,12 +764,14 @@ package show feedback on evil edit code
      :config
      (projectile-global-mode)
      (setq projectile-enable-caching t)
-     (setq projectile-project-search-path '("~/Develop/"))
-     (setq projectile-completion-system 'ivy))
-   (use-package counsel-projectile
-     :ensure t
+     (setq projectile-project-search-path '("~/Develop/")))
+
+   (use-package consult
+     :after projectile
+     :defines consult-buffer-sources
      :config
-     (counsel-projectile-mode))
+     (projectile-load-known-projects))
+
  #+END_SRC
 
 ** Tab config
@@ -1169,14 +1164,14 @@ package show feedback on evil edit code
 ** Autocomplete
 #+BEGIN_SRC emacs-lisp
 
-  ;; (use-package company
-  ;;   :ensure t
-  ;;   :config
-  ;;   (setq company-idle-delay 0)
-  ;;   (setq company-minimum-prefix-length 3)
-  ;;   (global-company-mode t))
+  (use-package company
+    :ensure t
+    :config
+    (setq company-idle-delay 0)
+    (setq company-minimum-prefix-length 3)
+    (global-company-mode t))
 
-  ;; (add-hook 'after-init-hook 'global-company-mode)
+  (add-hook 'after-init-hook 'global-company-mode)
 
 #+END_SRC
 
@@ -1232,7 +1227,11 @@ package show feedback on evil edit code
          :map vertico-map
          ("C-j" . vertico-next)
          ("C-k" . vertico-previous)
-         ("C-g" . vertico-last)
+         ("C-a" . vertico-first)
+         ("C-l" . vertico-last)
+         ("C-u" . vertico-next-group)
+         ("C-y" . vertico-previous-group)
+         ("C-h" . backward-delete-char)
          :map minibuffer-local-map
          ("M-h" . backward-kill-word))
   :custom
@@ -1264,183 +1263,153 @@ package show feedback on evil edit code
 ** consult
 #+BEGIN_SRC emacs-lisp
   ;; Example configuration for Consult
-(use-package consult
-  ;; Replace bindings. Lazily loaded due by `use-package'.
-  :bind (;; C-c bindings (mode-specific-map)
-         ("C-c h" . consult-history)
-         ("C-c m" . consult-mode-command)
-         ("C-c b" . consult-bookmark)
-         ("C-c k" . consult-kmacro)
-         ;; C-x bindings (ctl-x-map)
-         ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
-         ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
-         ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
-         ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
-         ;; Custom M-# bindings for fast register access
-         ("M-#" . consult-register-load)
-         ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
-         ("C-M-#" . consult-register)
-         ;; Other custom bindings
-         ("M-y" . consult-yank-pop)                ;; orig. yank-pop
-         ("<help> a" . consult-apropos)            ;; orig. apropos-command
-         ;; M-g bindings (goto-map)
-         ("M-g e" . consult-compile-error)
-         ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
-         ("M-g g" . consult-goto-line)             ;; orig. goto-line
-         ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
-         ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
-         ("M-g m" . consult-mark)
-         ("M-g k" . consult-global-mark)
-         ("M-g i" . consult-imenu)
-         ("M-g I" . consult-imenu-multi)
-         ;; M-s bindings (search-map)
-         ("M-s f" . consult-find)
-         ("M-s F" . consult-locate)
-         ("M-s g" . consult-grep)
-         ("M-s G" . consult-git-grep)
-         ("M-s r" . consult-ripgrep)
-         ("M-s l" . consult-line)
-         ("M-s L" . consult-line-multi)
-         ("M-s m" . consult-multi-occur)
-         ("M-s k" . consult-keep-lines)
-         ("M-s u" . consult-focus-lines)
-         ;; Isearch integration
-         ("M-s e" . consult-isearch)
-         :map isearch-mode-map
-         ("M-e" . consult-isearch)                 ;; orig. isearch-edit-string
-         ("M-s e" . consult-isearch)               ;; orig. isearch-edit-string
-         ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
-         ("M-s L" . consult-line-multi))           ;; needed by consult-line to detect isearch
+  (use-package consult
+    ;; Replace bindings. Lazily loaded due by `use-package'.
+    :bind (;; C-c bindings (mode-specific-map)
+           ("C-c h" . consult-history)
+           ("C-c m" . consult-mode-command)
+           ("C-c b" . consult-bookmark)
+           ("C-c k" . consult-kmacro)
+           ;; C-x bindings (ctl-x-map)
+           ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+           ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
+           ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+           ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+           ;; Custom M-# bindings for fast register access
+           ("M-#" . consult-register-load)
+           ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+           ("C-M-#" . consult-register)
+           ;; Other custom bindings
+           ("M-y" . consult-yank-pop)                ;; orig. yank-pop
+           ("<help> a" . consult-apropos)            ;; orig. apropos-command
+           ;; M-g bindings (goto-map)
+           ("M-g e" . consult-compile-error)
+           ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+           ("M-g g" . consult-goto-line)             ;; orig. goto-line
+           ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
+           ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+           ("M-g m" . consult-mark)
+           ("M-g k" . consult-global-mark)
+           ("M-g i" . consult-imenu)
+           ("M-g I" . consult-imenu-multi)
+           ;; M-s bindings (search-map)
+           ("M-s f" . consult-find)
+           ("M-s F" . consult-locate)
+           ("M-s g" . consult-grep)
+           ("M-s G" . consult-git-grep)
+           ("M-s r" . consult-ripgrep)
+           ("M-s l" . consult-line)
+           ("M-s L" . consult-line-multi)
+           ("M-s m" . consult-multi-occur)
+           ("M-s k" . consult-keep-lines)
+           ("M-s u" . consult-focus-lines)
+           ;; Isearch integration
+           ("M-s e" . consult-isearch)
+           :map isearch-mode-map
+           ("M-e" . consult-isearch)                 ;; orig. isearch-edit-string
+           ("M-s e" . consult-isearch)               ;; orig. isearch-edit-string
+           ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+           ("M-s L" . consult-line-multi))           ;; needed by consult-line to detect isearch
 
-  ;; Enable automatic preview at point in the *Completions* buffer.
-  ;; This is relevant when you use the default completion UI,
-  ;; and not necessary for Vertico, Selectrum, etc.
-  :hook (completion-list-mode . consult-preview-at-point-mode)
+    ;; Enable automatic preview at point in the *Completions* buffer.
+    ;; This is relevant when you use the default completion UI,
+    ;; and not necessary for Vertico, Selectrum, etc.
+    :hook (completion-list-mode . consult-preview-at-point-mode)
 
-  ;; The :init configuration is always executed (Not lazy)
-  :init
+    ;; The :init configuration is always executed (Not lazy)
+    :init
 
-  ;; Optionally configure the register formatting. This improves the register
-  ;; preview for `consult-register', `consult-register-load',
-  ;; `consult-register-store' and the Emacs built-ins.
-  (setq register-preview-delay 0
-        register-preview-function #'consult-register-format)
+    ;; Optionally configure the register formatting. This improves the register
+    ;; preview for `consult-register', `consult-register-load',
+    ;; `consult-register-store' and the Emacs built-ins.
+    (setq register-preview-delay 0
+          register-preview-function #'consult-register-format)
 
-  ;; Optionally tweak the register preview window.
-  ;; This adds thin lines, sorting and hides the mode line of the window.
-  (advice-add #'register-preview :override #'consult-register-window)
+    ;; Optionally tweak the register preview window.
+    ;; This adds thin lines, sorting and hides the mode line of the window.
+    (advice-add #'register-preview :override #'consult-register-window)
 
-  ;; Optionally replace `completing-read-multiple' with an enhanced version.
-  (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
+    ;; Optionally replace `completing-read-multiple' with an enhanced version.
+    (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
 
-  ;; Use Consult to select xref locations with preview
-  (setq xref-show-xrefs-function #'consult-xref
-        xref-show-definitions-function #'consult-xref)
+    ;; Use Consult to select xref locations with preview
+    (setq xref-show-xrefs-function #'consult-xref
+          xref-show-definitions-function #'consult-xref)
 
-  ;; Configure other variables and modes in the :config section,
-  ;; after lazily loading the package.
-  :config
+    ;; Configure other variables and modes in the :config section,
+    ;; after lazily loading the package.
+    :config
 
-  ;; Optionally configure preview. The default value
-  ;; is 'any, such that any key triggers the preview.
-  ;; (setq consult-preview-key 'any)
-  ;; (setq consult-preview-key (kbd "M-."))
-  ;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
-  ;; For some commands and buffer sources it is useful to configure the
-  ;; :preview-key on a per-command basis using the `consult-customize' macro.
-  (consult-customize
-   consult-theme
-   :preview-key '(:debounce 0.2 any)
-   consult-ripgrep consult-git-grep consult-grep
-   consult-bookmark consult-recent-file consult-xref
-   consult--source-file consult--source-project-file consult--source-bookmark
-   :preview-key (kbd "M-."))
+    ;; Optionally configure preview. The default value
+    ;; is 'any, such that any key triggers the preview.
+    ;; (setq consult-preview-key 'any)
+    ;; (setq consult-preview-key (kbd "M-."))
+    ;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
+    ;; For some commands and buffer sources it is useful to configure the
+    ;; :preview-key on a per-command basis using the `consult-customize' macro.
+    (consult-customize
+     consult-theme
+     :preview-key '(:debounce 0.2 any)
+     consult-ripgrep consult-git-grep consult-grep
+     consult-bookmark consult-recent-file consult-xref
+     consult--source-file consult--source-project-file consult--source-bookmark
+     :preview-key (kbd "M-."))
 
-  ;; Optionally configure the narrowing key.
-  ;; Both < and C-+ work reasonably well.
-  (setq consult-narrow-key "<") ;; (kbd "C-+")
+    ;; Optionally configure the narrowing key.
+    ;; Both < and C-+ work reasonably well.
+    (setq consult-narrow-key "<") ;; (kbd "C-+")
 
-  ;; Optionally make narrowing help available in the minibuffer.
-  ;; You may want to use `embark-prefix-help-command' or which-key instead.
-  ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
+    ;; Optionally make narrowing help available in the minibuffer.
+    ;; You may want to use `embark-prefix-help-command' or which-key instead.
+    ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
 
-  ;; Optionally configure a function which returns the project root directory.
-  ;; There are multiple reasonable alternatives to chose from.
-  ;;;; 1. project.el (project-roots)
-  (setq consult-project-root-function
-        (lambda ()
-          (when-let (project (project-current))
-            (car (project-roots project)))))
-  ;;;; 2. projectile.el (projectile-project-root)
-  ;; (autoload 'projectile-project-root "projectile")
-  ;; (setq consult-project-root-function #'projectile-project-root)
-  ;;;; 3. vc.el (vc-root-dir)
-  ;; (setq consult-project-root-function #'vc-root-dir)
-  ;;;; 4. locate-dominating-file
-  ;; (setq consult-project-root-function (lambda () (locate-dominating-file "." ".git")))
-)
+    ;; Optionally configure a function which returns the project root directory.
+    ;; There are multiple reasonable alternatives to chose from.
+        ;;;; 1. project.el (project-roots)
+    (setq consult-project-root-function
+          (lambda ()
+            (when-let (project (project-current))
+              (car (project-roots project)))))
+        ;;;; 2. projectile.el (projectile-project-root)
+    ;; (autoload 'projectile-project-root "projectile")
+    ;; (setq consult-project-root-function #'projectile-project-root)
+        ;;;; 3. vc.el (vc-root-dir)
+    ;; (setq consult-project-root-function #'vc-root-dir)
+        ;;;; 4. locate-dominating-file
+    ;; (setq consult-project-root-function (lambda () (locate-dominating-file "." ".git")))
+    )
 
-#+END_SRC
+  ;; here goes my config
+  ;; recent file list in buffer list
+  (add-hook 'buffer-list-update-hook 'recentf-track-opened-file)
+  (recentf-mode 1)
+  (setq recent-max-menu-items 25)
+  (setq recent-max-saved-items 25)
 
-** corfu
+  (general-define-key
+   :states '(normal visual)
+   :prefix ","
+   "x" 'execute-extended-command)
+
+  (general-define-key
+   :states '(normal visual)
+   :prefix ","
+   "hk" 'consult-keep-lines)
+  (general-define-key
+   :states '(normal visual)
+   :prefix ","
+   "fk" 'consult-focus-lines)
+  (general-define-key
+   :states '(normal visual)
+   :prefix ","
+   ":" 'consult-complex-command)
+
+   #+END_SRC
+
+** sashachua config
 #+BEGIN_SRC emacs-lisp
+  ;; navigation in sentense with one space
+  (setq sentence-end-double-space nil)
 
-    (use-package corfu
-    ;; Optional customizations
-    :custom
-    (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-    (corfu-auto t)                 ;; Enable auto completion
-    (corfu-commit-predicate nil)   ;; Do not commit selected candidates on next input
-    (corfu-quit-at-boundary t)     ;; Automatically quit at word boundary
-    (corfu-quit-no-match t)        ;; Automatically quit if there is no match
-    (corfu-echo-documentation nil) ;; Do not show documentation in the echo area
-
-    ;; Optionally use TAB for cycling, default is `corfu-complete'.
-    ;; :bind (:map corfu-map
-    ;;        ("TAB" . corfu-next)
-    ;;        ([tab] . corfu-next)
-    ;;        ("S-TAB" . corfu-previous)
-    ;;        ([backtab] . corfu-previous))
-
-    ;; You may want to enable Corfu only for certain modes.
-    ;; :hook ((prog-mode . corfu-mode)
-    ;;        (shell-mode . corfu-mode)
-    ;;        (eshell-mode . corfu-mode))
-
-    ;; Recommended: Enable Corfu globally.
-    ;; This is recommended since dabbrev can be used globally (M-/).
-    :init
-    (corfu-global-mode))
-
-    ;; Optionally use the `orderless' completion style.
-  ;; Enable `partial-completion' for files to allow path expansion.
-  ;; You may prefer to use `initials' instead of `partial-completion'.
-  (use-package orderless
-    :init
-    (setq completion-styles '(orderless)
-          completion-category-defaults nil
-          completion-category-overrides '((file (styles . (partial-completion))))))
-
-  ;; Dabbrev works with Corfu
-  (use-package dabbrev
-    ;; Swap M-/ and C-M-/
-    :bind (("M-/" . dabbrev-completion)
-           ("C-M-/" . dabbrev-expand)))
-
-
-    (use-package emacs
-    :init
-    ;; TAB cycle if there are only few candidates
-    (setq completion-cycle-threshold 3)
-
-    ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
-    ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
-    ;; (setq read-extended-command-predicate
-    ;;       #'command-completion-default-include-p)
-
-    ;; Enable indentation+completion using the TAB key.
-    ;; `completion-at-point' is often bound to M-TAB.
-    (setq tab-always-indent 'complete))
-  (setq)
 
 #+END_SRC
