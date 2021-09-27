@@ -42,12 +42,13 @@
    (defalias 'yes-or-no-p 'y-or-n-p)
    (line-number-mode 1)
    (column-number-mode 1)
+  
    (set-frame-font "Input-18:antialiasing=false")
    ;; Disable backup/autosave files
    (setq make-backup-files nil)
    (setq auto-save-default nil)
    (setq auto-save-list-file-name nil)
-
+  
   ;; show relative line numbers
   (global-display-line-numbers-mode -1)
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
@@ -57,62 +58,62 @@
    ;; (global-visual-line-mode t)
    (electric-pair-mode 1)
    (blink-cursor-mode 0)
-
+  
    (setq require-final-newline t) ;; remove end of file message in magit
-
+  
    (setq show-paren-delay 0)
    (show-paren-mode 1)
-
+  
 #+END_SRC
 
 ** Evil
 #+BEGIN_SRC emacs-lisp
-  (use-package evil
-    :ensure t
-    :init
-    (setq evil-want-integration t)
-    (setq evil-want-keybinding nil)
-    (setq evil-vsplit-window-right t)
-    :config
-    (evil-mode 1))
-
-  (use-package evil-collection
-    :after evil
-    :ensure t
-    ;; :custom (evil-collection-setup-minibuffer t)
-    ;; :init
-    ;; (setq evil-want-minibuffer t)
-    :config
-    (evil-collection-init))
-
-
-  (use-package evil-leader
-    :ensure t
-    :config
-    (global-evil-leader-mode))
-
-  (use-package evil-surround
-    :ensure t
-    :config
-    (global-evil-surround-mode))
-
-  ;; evil org mode
-  (use-package evil-org
-    :ensure t
-    :after org
-    :config
-    (add-hook 'org-mode-hook 'evil-org-mode)
-    (add-hook 'evil-org-mode-hook
-              (lambda () (evil-org-set-key-theme))))
-
-  (use-package evil-indent-textobject
-    :ensure t)
-
-  (use-package evil-commentary
-    :ensure t
-    :config
-    (evil-commentary-mode))
-
+    (use-package evil
+      :ensure t
+      :init
+      (setq evil-want-integration t)
+      (setq evil-want-keybinding nil)
+      (setq evil-vsplit-window-right t)
+      :config
+      (evil-mode 1))
+  
+    (use-package evil-collection
+      :after evil
+      :ensure t
+      ;; :custom (evil-collection-setup-minibuffer t)
+      ;; :init
+      ;; (setq evil-want-minibuffer t)
+      :config
+      (evil-collection-init))
+  
+  
+    (use-package evil-leader
+      :ensure t
+      :config
+      (global-evil-leader-mode))
+  
+    (use-package evil-surround
+      :ensure t
+      :config
+      (global-evil-surround-mode))
+  
+    ;; evil org mode
+    (use-package evil-org
+      :ensure t
+      :after org
+      :config
+      (add-hook 'org-mode-hook 'evil-org-mode)
+      (add-hook 'evil-org-mode-hook
+                (lambda () (evil-org-set-key-theme))))
+  
+    (use-package evil-indent-textobject
+      :ensure t)
+  
+    (use-package evil-commentary
+      :ensure t
+      :config
+      (evil-commentary-mode))
+  
 #+END_SRC
 
 ** General
@@ -933,19 +934,19 @@ package show feedback on evil edit code
    (require 'org-capture)
    (require 'org-protocol)
    (server-start)
-
+  
   ; close capture frames when finished capturing
    (add-hook 'org-capture-after-finalize-hook (lambda () (delete-frame)))
-
+  
    ; make org-capture open up as sole window in a new frame
   (defun run-capture-hooks ()
   "Run all the following functions in the hook"
   (delete-other-windows)
   (set-frame-font "Input-18:antialiasing=false")
   )
-
+  
   (add-hook 'server-after-make-frame-hook #'run-capture-hooks)
-
+  
 #+END_SRC
 ** org-roam
 #+BEGIN_SRC emacs-lisp
@@ -1195,7 +1196,7 @@ package show feedback on evil edit code
 ** elfeed
 #+BEGIN_SRC emacs-lisp
   (use-package elfeed)
-
+  
   (setq elfeed-feeds
         '("http://nullprogram.com/feed/"
           "https://d12frosted.io/atom.xml"
@@ -1204,13 +1205,21 @@ package show feedback on evil edit code
           "https://alistapart.com/site/rss"
           "https://www.smashingmagazine.com/feed"
           "https://www.sitepoint.com/feed/"
-          "https://vc.ru/rss"
-          "https://meduza.io/rss2/all"
-          "https://russia-insider.com/en/all-content/rss"
+  "https://www.liga.net/news/articles/rss.xml"
+  "https://meduza.io/rss2/all"
+          "https://habr.com/ru/rss/feed/posts/all/a9a16e7179e4c0057adacd7ec7bf6092/?fl=ru"
           "https://planet.emacslife.com/atom.xml"))
-
-  (add-hook 'elfeed-show-mode-hook 'olivetti-mode)
-
+  
+  ;; (add-hook 'elfeed-show-mode-hook 'olivetti-mode)
+  (setq-default elfeed-search-filter "@2-week-ago +unread ")
+  
+  
+  (setq elfeed-show-mode-hook
+      (lambda ()
+        (setq shr-use-fonts nil)
+        (olivetti-mode t)
+        ))
+  
 #+END_SRC
 
 ** pug-mode
@@ -1441,3 +1450,14 @@ package show feedback on evil edit code
   (evil-owl-mode))
   
 #+END_SRC
+
+** undo fu
+#+BEGIN_SRC emacs-lisp
+  (use-package undo-fu
+  :demand
+  :general
+  (:states 'normal
+           "u" 'undo-fu-only-undo
+           "\C-r" 'undo-fu-only-redo))
+#+END_SRC
+
