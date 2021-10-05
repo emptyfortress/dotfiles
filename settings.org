@@ -42,13 +42,13 @@
    (defalias 'yes-or-no-p 'y-or-n-p)
    (line-number-mode 1)
    (column-number-mode 1)
-  
+
    (set-frame-font "Input-18:antialiasing=false")
    ;; Disable backup/autosave files
    (setq make-backup-files nil)
    (setq auto-save-default nil)
    (setq auto-save-list-file-name nil)
-  
+
   ;; show relative line numbers
   (global-display-line-numbers-mode -1)
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
@@ -58,12 +58,12 @@
    ;; (global-visual-line-mode t)
    (electric-pair-mode 1)
    (blink-cursor-mode 0)
-  
+
    (setq require-final-newline t) ;; remove end of file message in magit
-  
+
    (setq show-paren-delay 0)
    (show-paren-mode 1)
-  
+
 #+END_SRC
 
 ** Evil
@@ -76,7 +76,7 @@
       (setq evil-vsplit-window-right t)
       :config
       (evil-mode 1))
-  
+
     (use-package evil-collection
       :after evil
       :ensure t
@@ -85,18 +85,18 @@
       ;; (setq evil-want-minibuffer t)
       :config
       (evil-collection-init))
-  
-  
+
+
     (use-package evil-leader
       :ensure t
       :config
       (global-evil-leader-mode))
-  
+
     (use-package evil-surround
       :ensure t
       :config
       (global-evil-surround-mode))
-  
+
     ;; evil org mode
     (use-package evil-org
       :ensure t
@@ -105,15 +105,15 @@
       (add-hook 'org-mode-hook 'evil-org-mode)
       (add-hook 'evil-org-mode-hook
                 (lambda () (evil-org-set-key-theme))))
-  
+
     (use-package evil-indent-textobject
       :ensure t)
-  
+
     (use-package evil-commentary
       :ensure t
       :config
       (evil-commentary-mode))
-  
+
 #+END_SRC
 
 ** General
@@ -139,8 +139,9 @@
 
           (evil-leader/set-key
               "f" 'projectile-command-map
-              "R" 'counsel-projectile-rg
+              "R" 'consult-git-grep
               "w" 'save-buffer
+              ",w" 'projectile-save-project-buffers
               "v" 'evil-window-vsplit
               "o" 'delete-other-windows
               ",o" 'consult-outline
@@ -158,6 +159,7 @@
               "." 'org-time-stamp
               "a" 'org-agenda
               "gr" 'my-revert-buffer
+              "zf" 'vimish-fold
               "gs" 'magit-status)
 
           (defun my-revert-buffer ()
@@ -647,10 +649,12 @@ package show feedback on evil edit code
 
 ** fold
 #+BEGIN_SRC emacs-lisp
-  (require 'vimish-fold)
   (use-package vimish-fold
-    :ensure
-    :after evil)
+    :ensure t
+    :after evil
+    :init
+    (vimish-fold-global-mode 1))
+
 
   (use-package evil-vimish-fold
     :ensure
@@ -658,12 +662,12 @@ package show feedback on evil edit code
     :init
     (setq evil-vimish-fold-mode-lighter " ⮒")
     (setq evil-vimish-fold-target-modes '(prog-mode conf-mode text-mode))
-    :config
     (global-evil-vimish-fold-mode))
 
+  ;; (global-evil-vimish-fold-mode)
   (general-define-key
    :states 'normal
-   "zf" 'vimish-fold-avy)
+   "zF" 'vimish-fold-avy)
 #+END_SRC
 
 ** Insert blank lines
@@ -745,8 +749,10 @@ package show feedback on evil edit code
     (display-line-numbers-mode 1)
     (setq mmm-submode-decoration-level 0)
     (prettier-mode 1)
+    ;; (whitespace-mode 1)
     (global-set-key (kbd "C-c C-e") 'vue-mode-edit-indirect-at-point)
     (add-to-list 'write-file-functions 'delete-trailing-whitespace)
+
 
     (general-define-key
           :states '(normal visual)
@@ -828,17 +834,18 @@ package show feedback on evil edit code
 
 ** lsp
 #+BEGIN_SRC emacs-lisp
-    ;; (use-package lsp-mode
-    ;;   :init
-    ;;   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-    ;;   (setq lsp-keymap-prefix "C-c l")
-    ;;   :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-    ;;           (js-mode . lsp-deferred)
-    ;;           (typescript-mode . lsp-deferred)
-    ;;           (vue-mode . lsp-deferred)
-    ;;           ;; if you want which-key integration
-    ;;           (lsp-mode . lsp-enable-which-key-integration))
-    ;;   :commands (lsp lsp-deferred))
+    (use-package lsp-mode
+      :init
+      ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+      (setq lsp-keymap-prefix "C-c l")
+      (setq lsp-headerline-breadcrumb-enable nil)
+      :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+              (js-mode . lsp-deferred)
+              (typescript-mode . lsp-deferred)
+              (vue-mode . lsp-deferred)
+              ;; if you want which-key integration
+              (lsp-mode . lsp-enable-which-key-integration))
+      :commands (lsp lsp-deferred))
 
   (use-package lsp-mode
     :custom
@@ -905,21 +912,20 @@ package show feedback on evil edit code
     (exec-path-from-shell-initialize))
 
 #+END_SRC
-
 ** abbrev
 #+BEGIN_SRC emacs-lisp
   (load "~/.emacs.d/lisp/my-abbrev.el")
-  (defun insert-space-or-expand-abbrev ()
-    "Expand abbrev if previous char is a space, or insert a space."
-    (interactive)
-    (if (not (equal (char-before) ?\s))
-        (insert-char ?\s)
-      (backward-char)
-      (unless (expand-abbrev)
-        (insert-char ?\s))
-      (forward-char)))
+  ;; (defun insert-space-or-expand-abbrev ()
+  ;;   "Expand abbrev if previous char is a space, or insert a space."
+  ;;   (interactive)
+  ;;   (if (not (equal (char-before) ?\s))
+  ;;       (insert-char ?\s)
+  ;;     (backward-char)
+  ;;     (unless (expand-abbrev)
+  ;;       (insert-char ?\s))
+  ;;     (forward-char)))
 
-  (global-set-key " " #'insert-space-or-expand-abbrev)
+  ;; (global-set-key " " #'insert-space-or-expand-abbrev)
 #+END_SRC
 ** emojify
 #+BEGIN_SRC emacs-lisp
@@ -934,19 +940,19 @@ package show feedback on evil edit code
    (require 'org-capture)
    (require 'org-protocol)
    (server-start)
-  
+
   ; close capture frames when finished capturing
    (add-hook 'org-capture-after-finalize-hook (lambda () (delete-frame)))
-  
+
    ; make org-capture open up as sole window in a new frame
   (defun run-capture-hooks ()
   "Run all the following functions in the hook"
   (delete-other-windows)
   (set-frame-font "Input-18:antialiasing=false")
   )
-  
+
   (add-hook 'server-after-make-frame-hook #'run-capture-hooks)
-  
+
 #+END_SRC
 ** org-roam
 #+BEGIN_SRC emacs-lisp
@@ -1196,7 +1202,7 @@ package show feedback on evil edit code
 ** elfeed
 #+BEGIN_SRC emacs-lisp
   (use-package elfeed)
-  
+
   (setq elfeed-feeds
         '("http://nullprogram.com/feed/"
           "https://d12frosted.io/atom.xml"
@@ -1205,21 +1211,21 @@ package show feedback on evil edit code
           "https://alistapart.com/site/rss"
           "https://www.smashingmagazine.com/feed"
           "https://www.sitepoint.com/feed/"
-  "https://www.liga.net/news/articles/rss.xml"
-  "https://meduza.io/rss2/all"
+          "https://www.liga.net/news/articles/rss.xml"
+          "https://meduza.io/rss2/all"
           "https://habr.com/ru/rss/feed/posts/all/a9a16e7179e4c0057adacd7ec7bf6092/?fl=ru"
           "https://planet.emacslife.com/atom.xml"))
-  
+
   ;; (add-hook 'elfeed-show-mode-hook 'olivetti-mode)
   (setq-default elfeed-search-filter "@2-week-ago +unread ")
-  
-  
+
+
   (setq elfeed-show-mode-hook
-      (lambda ()
-        (setq shr-use-fonts nil)
-        (olivetti-mode t)
-        ))
-  
+        (lambda ()
+          (setq shr-use-fonts nil)
+          (olivetti-mode t)
+          ))
+
 #+END_SRC
 
 ** pug-mode
@@ -1279,7 +1285,7 @@ package show feedback on evil edit code
            ;; ("C-c m" . consult-mode-command)
            ;; ("C-c b" . consult-bookmark)
            ;; ("C-c k" . consult-kmacro)
-  
+
            ;; C-x bindings (ctl-x-map)
            ;; ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
            ;; ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
@@ -1320,36 +1326,36 @@ package show feedback on evil edit code
            ("M-s e" . consult-isearch)               ;; orig. isearch-edit-string
            ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
            ("M-s L" . consult-line-multi))           ;; needed by consult-line to detect isearch
-  
+
     ;; Enable automatic preview at point in the *Completions* buffer.
     ;; This is relevant when you use the default completion UI,
     ;; and not necessary for Vertico, Selectrum, etc.
     :hook (completion-list-mode . consult-preview-at-point-mode)
-  
+
     ;; The :init configuration is always executed (Not lazy)
     :init
-  
+
     ;; Optionally configure the register formatting. This improves the register
     ;; preview for `consult-register', `consult-register-load',
     ;; `consult-register-store' and the Emacs built-ins.
     (setq register-preview-delay 0
           register-preview-function #'consult-register-format)
-  
+
     ;; Optionally tweak the register preview window.
     ;; This adds thin lines, sorting and hides the mode line of the window.
     (advice-add #'register-preview :override #'consult-register-window)
-  
+
     ;; Optionally replace `completing-read-multiple' with an enhanced version.
     (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
-  
+
     ;; Use Consult to select xref locations with preview
     (setq xref-show-xrefs-function #'consult-xref
           xref-show-definitions-function #'consult-xref)
-  
+
     ;; Configure other variables and modes in the :config section,
     ;; after lazily loading the package.
     :config
-  
+
     ;; Optionally configure preview. The default value
     ;; is 'any, such that any key triggers the preview.
     ;; (setq consult-preview-key 'any)
@@ -1364,15 +1370,15 @@ package show feedback on evil edit code
      consult-bookmark consult-recent-file consult-xref
      consult--source-file consult--source-project-file consult--source-bookmark
      :preview-key (kbd "M-."))
-  
+
     ;; Optionally configure the narrowing key.
     ;; Both < and C-+ work reasonably well.
     (setq consult-narrow-key "<") ;; (kbd "C-+")
-  
+
     ;; Optionally make narrowing help available in the minibuffer.
     ;; You may want to use `embark-prefix-help-command' or which-key instead.
     ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
-  
+
     ;; Optionally configure a function which returns the project root directory.
     ;; There are multiple reasonable alternatives to chose from.
         ;;;; 1. project.el (project-roots)
@@ -1388,19 +1394,19 @@ package show feedback on evil edit code
         ;;;; 4. locate-dominating-file
     ;; (setq consult-project-root-function (lambda () (locate-dominating-file "." ".git")))
     )
-  
+
   ;; here goes my config
   ;; recent file list in buffer list
   (add-hook 'buffer-list-update-hook 'recentf-track-opened-file)
   (recentf-mode 1)
   (setq recent-max-menu-items 25)
   (setq recent-max-saved-items 25)
-  
+
   (general-define-key
    :states '(normal visual)
    :prefix ","
    "x" 'execute-extended-command)
-  
+
   (general-define-key
    :states '(normal visual)
    :prefix ","
@@ -1413,15 +1419,15 @@ package show feedback on evil edit code
    :states '(normal visual)
    :prefix ","
    ":" 'consult-complex-command)
-  
+
   (general-define-key
         :states '(normal visual)
         "/" 'consult-line)
-  
-  (general-define-key
-        :states '(normal visual)
-        :prefix ","
-        "R" 'consult-ripgrep)
+
+  ;; (general-define-key
+  ;;       :states '(normal visual)
+  ;;       :prefix ","
+  ;;       "R" 'consult-git-grep)
    #+END_SRC
 
 ** sashachua config
@@ -1434,7 +1440,7 @@ package show feedback on evil edit code
 
 ** owl
 #+BEGIN_SRC emacs-lisp
-  
+
   (use-package evil-owl
   :config
   (setq evil-owl-max-string-length 50)
@@ -1448,11 +1454,12 @@ package show feedback on evil edit code
                  (side . right)
                  (window-width . 0.2)))
   (evil-owl-mode))
-  
+
 #+END_SRC
 
 ** undo fu
 #+BEGIN_SRC emacs-lisp
+
   (use-package undo-fu
   :demand
   :general
@@ -1461,3 +1468,116 @@ package show feedback on evil edit code
            "\C-r" 'undo-fu-only-redo))
 #+END_SRC
 
+** polymode
+custom vue setup from here https://github.com/AdamNiederer/vue-mode/issues/109
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package polymode
+  ;;       :ensure t
+  ;;       :defer t
+  ;;       :hook (vue-mode . lsp-deferred)
+  ;;       :mode ("\\.vue\\'" . vue-mode)
+  ;;       :config
+
+  ;;       (define-innermode poly-vue-template-innermode
+  ;;         :mode 'html-mode
+  ;;         :head-matcher "<[[:space:]]*template[[:space:]]*[[:space:]]*>"
+  ;;         :tail-matcher "</[[:space:]]*template[[:space:]]*[[:space:]]*>"
+  ;;         :head-mode 'host
+  ;;         :tail-mode 'host)
+
+  ;;       (define-innermode poly-vue-script-innermode
+  ;;         :mode 'js-mode
+  ;;         :head-matcher "<[[:space:]]*script[[:space:]]*[[:space:]]*>"
+  ;;         :tail-matcher "</[[:space:]]*script[[:space:]]*[[:space:]]*>"
+  ;;         :head-mode 'host
+  ;;         :tail-mode 'host)
+
+  ;;       (define-innermode poly-vue-typescript-innermode
+  ;;         :mode 'typescript-mode
+  ;;         :head-matcher "<[[:space:]]*script[[:space:]]*lang=[[:space:]]*[\"'][[:space:]]*ts[[:space:]]*[\"'][[:space:]]*>"
+  ;;         :tail-matcher "</[[:space:]]*script[[:space:]]*[[:space:]]*>"
+  ;;         :head-mode 'host
+  ;;         :tail-mode 'host)
+
+  ;;       (define-innermode poly-vue-javascript-innermode
+  ;;         :mode 'js2-mode
+  ;;         :head-matcher "<[[:space:]]*script[[:space:]]*lang=[[:space:]]*[\"'][[:space:]]*js[[:space:]]*[\"'][[:space:]]*>"
+  ;;         :tail-matcher "</[[:space:]]*script[[:space:]]*[[:space:]]*>"
+  ;;         :head-mode 'host
+  ;;         :tail-mode 'host)
+
+  ;;       (define-auto-innermode poly-vue-template-tag-lang-innermode
+  ;;         :head-matcher "<[[:space:]]*template[[:space:]]*lang=[[:space:]]*[\"'][[:space:]]*[[:alpha:]]+[[:space:]]*[\"'][[:space:]]*>"
+  ;;         :tail-matcher "</[[:space:]]*template[[:space:]]*[[:space:]]*>"
+  ;;         :mode-matcher (cons  "<[[:space:]]*template[[:space:]]*lang=[[:space:]]*[\"'][[:space:]]*\\([[:alpha:]]+\\)[[:space:]]*[\"'][[:space:]]*>" 1)
+  ;;         :head-mode 'host
+  ;;         :tail-mode 'host)
+
+  ;;       (define-auto-innermode poly-vue-script-tag-lang-innermode
+  ;;         :head-matcher "<[[:space:]]*script[[:space:]]*lang=[[:space:]]*[\"'][[:space:]]*[[:alpha:]]+[[:space:]]*[\"'][[:space:]]*>"
+  ;;         :tail-matcher "</[[:space:]]*script[[:space:]]*[[:space:]]*>"
+  ;;         :mode-matcher (cons  "<[[:space:]]*script[[:space:]]*lang=[[:space:]]*[\"'][[:space:]]*\\([[:alpha:]]+\\)[[:space:]]*[\"'][[:space:]]*>" 1)
+  ;;         :head-mode 'host
+  ;;         :tail-mode 'host)
+
+  ;;       (define-auto-innermode poly-vue-style-tag-lang-innermode
+  ;;               :head-matcher "<[[:space:]]*\\(?:style\\)\\(?:scoped\\|[[:space:]]\\)*lang=[[:space:]]*[\"'][[:space:]]*[[:alpha:]]+[[:space:]]*[\"']*\\(?:scoped\\|[[:space:]]\\)*>"
+  ;;               :tail-matcher "</[[:space:]]*\\(?:style\\)[[:space:]]*>"
+  ;;               :mode-matcher (cons  "<[[:space:]]*\\(?:style\\)\\(?:scoped\\|[[:space:]]\\)*lang=[[:space:]]*[\"'][[:space:]]*\\([[:alpha:]]+\\)[[:space:]]*[\"']\\(?:scoped\\|[[:space:]]\\)*>" 1)
+  ;;               :head-mode 'host
+  ;;               :tail-mode 'host)
+
+  ;;       (define-innermode poly-vue-style-innermode
+  ;;         :mode 'css-mode
+  ;;         :head-matcher "<[[:space:]]*\\(?:style\\)[[:space:]]*\\(?:scoped\\|[[:space:]]\\)*>"
+  ;;         :tail-matcher "</[[:space:]]*\\(?:style\\)[[:space:]]*>"
+  ;;         :head-mode 'host
+  ;;         :tail-mode 'host)
+
+
+  ;;       (define-polymode vue-mode
+  ;;         :hostmode 'poly-sgml-hostmode
+  ;;         :innermodes '(
+  ;;                       poly-vue-typescript-innermode
+  ;;                       poly-vue-javascript-innermode
+  ;;                       poly-vue-template-tag-lang-innermode
+  ;;                       poly-vue-script-tag-lang-innermode
+  ;;                       poly-vue-style-tag-lang-innermode
+  ;;                       poly-vue-template-innermode
+  ;;                       poly-vue-script-innermode
+  ;;                       poly-vue-style-innermode
+  ;;                       )))
+
+#+END_SRC
+
+** expand-region
+#+BEGIN_SRC emacs-lisp
+  (use-package key-chord :ensure t)
+  (key-chord-mode 1)
+  (use-package expand-region :ensure t)
+  (key-chord-define-global "vv"  'er/expand-region)
+
+#+END_SRC
+
+** engine-mode
+#+BEGIN_SRC emacs-lisp
+  (use-package engine-mode :ensure t)
+  (engine-mode t)
+  (defengine google
+    "http://www.google.com/search?ie=utf-8&oe=utf-8&q=%s"
+    :keybinding "g")
+
+  (defengine stack-overflow
+    "https://stackoverflow.com/search?q=%s"
+    :keybinding "s")
+
+  (general-define-key
+  :states 'normal
+  :prefix ","
+  "/g" 'engine/search-google)
+
+(general-define-key
+  :states 'normal
+  :prefix ","
+  "/s" 'engine/search-stack-overflow)
+#+END_SRC
