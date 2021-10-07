@@ -839,6 +839,9 @@ package show feedback on evil edit code
       ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
       (setq lsp-keymap-prefix "C-c l")
       (setq lsp-headerline-breadcrumb-enable nil)
+      (setq lsp-ui-sideline-enable nil)
+      (setq lsp-ui-doc-enable nil)
+      (setq lsp-prefer-flymake :none)
       :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
               (js-mode . lsp-deferred)
               (typescript-mode . lsp-deferred)
@@ -846,21 +849,25 @@ package show feedback on evil edit code
               ;; if you want which-key integration
               (lsp-mode . lsp-enable-which-key-integration))
       :commands (lsp lsp-deferred))
-
+  
   (use-package lsp-mode
     :custom
     (lsp-vetur-format-default-formatter-css "none")
     (lsp-vetur-format-default-formatter-html "none")
     (lsp-vetur-format-default-formatter-js "none")
-    (lsp-vetur-validation-template nil))
-
+    (lsp-vetur-validation-template t))
+  
+  ;; (use-package company-lsp
+  ;; :after lsp-mode
+  ;; :config (push 'company-lsp company-backends))
+  
   ;; (use-package lsp-ui
   ;; :hook (lsp-mode . lsp-ui-mode)
   ;; :custom
   ;; (lsp-ui-doc-position 'bottom))
-
+  
   ;; (use-package lsp-ivy)
-
+  
 #+END_SRC
 
 ** flycheck
