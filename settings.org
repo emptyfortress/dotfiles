@@ -841,7 +841,7 @@ package show feedback on evil edit code
       (setq lsp-headerline-breadcrumb-enable nil)
       (setq lsp-ui-sideline-enable nil)
       (setq lsp-ui-doc-enable nil)
-      (setq lsp-prefer-flymake :none)
+      (setq lsp-vetur-experimental-template-interpolation-service t)
       :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
               (js-mode . lsp-deferred)
               (typescript-mode . lsp-deferred)
@@ -850,12 +850,12 @@ package show feedback on evil edit code
               (lsp-mode . lsp-enable-which-key-integration))
       :commands (lsp lsp-deferred))
   
-  (use-package lsp-mode
-    :custom
-    (lsp-vetur-format-default-formatter-css "none")
-    (lsp-vetur-format-default-formatter-html "none")
-    (lsp-vetur-format-default-formatter-js "none")
-    (lsp-vetur-validation-template t))
+  ;; (use-package lsp-mode
+  ;;   :custom
+  ;;   (lsp-vetur-format-default-formatter-css "none")
+  ;;   (lsp-vetur-format-default-formatter-html "none")
+  ;;   (lsp-vetur-format-default-formatter-js "none")
+  ;;   (lsp-vetur-validation-template t))
   
   ;; (use-package company-lsp
   ;; :after lsp-mode
@@ -1177,16 +1177,17 @@ package show feedback on evil edit code
 
 ** Autocomplete
 #+BEGIN_SRC emacs-lisp
-
+  
   (use-package company
     :ensure t
     :config
     (setq company-idle-delay 0)
-    (setq company-minimum-prefix-length 3)
+    (setq company-minimum-prefix-length 2)
+    (setq lsp-completion-provider :capf)
     (global-company-mode t))
-
-  (add-hook 'after-init-hook 'global-company-mode)
-
+  
+  ;; (add-hook 'after-init-hook 'global-company-mode)
+  
 #+END_SRC
 
 ** which-key
