@@ -148,7 +148,6 @@
               "O" 'olivetti-mode
               "k" 'kill-current-buffer
               "s" 'avy-goto-word-1
-              "e" 'avy-goto-char-timer
               "l" 'avy-goto-line
               "b" 'consult-buffer
               "B" 'consult-buffer-other-window
@@ -884,30 +883,50 @@ package show feedback on evil edit code
 
   (add-hook 'flycheck-mode-hook #'my/use-eslint-from-node-modules)
 
-        (use-package flycheck
-          :ensure t
-          :init (global-flycheck-mode))
+  (use-package flycheck
+    :ensure t
+    :init (global-flycheck-mode))
 
-        ;; turn on flychecking globally
-        (add-hook 'after-init-hook #'global-flycheck-mode)
-          (setq flycheck-check-syntax-automatically '(mode-enabled save))
+  ;; turn on flychecking globally
+  (add-hook 'after-init-hook #'global-flycheck-mode)
+  (setq flycheck-check-syntax-automatically '(mode-enabled save))
 
-        (general-define-key
-          :states 'normal
-          :prefix ","
-          "f n" 'flycheck-next-error)
+  (general-define-key
+   :states 'normal
+   :prefix ","
+   "e e" 'flycheck-buffer)
+  (general-define-key
+   :states 'normal
+   :prefix ","
+   "e c" 'flycheck-clear)
+  (general-define-key
+   :states 'normal
+   :prefix ","
+   "e v" 'flycheck-verify-setup)
+  (general-define-key
+   :states 'normal
+   :prefix ","
+   "e l" 'flycheck-list-errors)
+  (general-define-key
+   :states 'normal
+   :prefix ","
+   "e n" 'flycheck-next-error)
+  (general-define-key
+   :states 'normal
+   :prefix ","
+   "e p" 'flycheck-previous-error)
 
-          ;; fix file and revert
+  ;; fix file and revert
 
-    (defun eslint-fix-file ()
-      (interactive)
-      (message "eslint --fixing the file" (buffer-file-name))
-      (shell-command (concat "eslint --fix " (buffer-file-name))))
+  ;; (defun eslint-fix-file ()
+  ;;   (interactive)
+  ;;   (message "eslint --fixing the file" (buffer-file-name))
+  ;;   (shell-command (concat "eslint --fix " (buffer-file-name))))
 
-    (defun eslint-fix-file-and-revert ()
-      (interactive)
-      (eslint-fix-file)
-      (revert-buffer t t))
+  ;; (defun eslint-fix-file-and-revert ()
+  ;;   (interactive)
+  ;;   (eslint-fix-file)
+  ;;   (revert-buffer t t))
 
 #+END_SRC
 
@@ -1589,6 +1608,7 @@ custom vue setup from here https://github.com/AdamNiederer/vue-mode/issues/109
   "/s" 'engine/search-stack-overflow)
 #+END_SRC
 
+<<<<<<< HEAD
 ** eglot
 #+BEGIN_SRC emacs-lisp
   ;; (require 'eglot)
@@ -1628,3 +1648,39 @@ custom vue setup from here https://github.com/AdamNiederer/vue-mode/issues/109
   ;;   (add-hook 'pbgc-vue-mode-hook 'pbgc-vue-custom)
   ;;   (add-to-list 'eglot-server-programs '(pbgc-vue-mode "vls"))
 #+END_SRC
+=======
+** embark
+#+BEGIN_SRC emacs-lisp
+  (use-package embark
+  :ensure t
+
+  :bind
+  (("C-." . embark-act)         ;; pick some comfortable binding
+   ("C-;" . embark-dwim)        ;; good alternative: M-.
+   ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
+
+  :init
+
+  ;; Optionally replace the key help with a completing-read interface
+  (setq prefix-help-command #'embark-prefix-help-command)
+
+  :config
+
+  ;; Hide the mode line of the Embark live/completions buffers
+  (add-to-list 'display-buffer-alist
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                 nil
+                 (window-parameters (mode-line-format . none)))))
+
+;; Consult users will also want the embark-consult package.
+(use-package embark-consult
+  :ensure t
+  :after (embark consult)
+  :demand t ; only necessary if you have the hook below
+  ;; if you want to have consult previews as you move around an
+  ;; auto-updating embark collect buffer
+  :hook
+  (embark-collect-mode . consult-preview-at-point-mode))
+#+END_SRC
+
+>>>>>>> 375f96a (add emark and embark-consult)
