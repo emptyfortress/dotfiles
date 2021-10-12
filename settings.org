@@ -1608,47 +1608,6 @@ custom vue setup from here https://github.com/AdamNiederer/vue-mode/issues/109
   "/s" 'engine/search-stack-overflow)
 #+END_SRC
 
-<<<<<<< HEAD
-** eglot
-#+BEGIN_SRC emacs-lisp
-  ;; (require 'eglot)
-
-  ;;   (add-hook 'eglot-managed-mode-hook
-  ;;             (lambda ()
-  ;;               (when (eglot-managed-p)
-  ;;                   (define-key eglot-mode-map (kbd "C-c r") 'eglot-rename)
-  ;;                   (define-key eglot-mode-map (kbd "C-c o") 'eglot-code-action-organize-imports)
-  ;;                   (define-key eglot-mode-map (kbd "C-c h") 'eldoc))))
-
-
-  ;;   (define-derived-mode pbgc-vue-mode web-mode "pbVue"
-  ;;     "A major mode derived from web-mode, for editing .vue files with LSP support.")
-  ;;   (add-to-list 'auto-mode-alist '("\\.vue\\'" . pbgc-vue-mode))
-  ;;   (defun pbgc-vue-custom ()
-  ;;     (company-mode)
-  ;;     (eglot-ensure))
-  ;;   (add-hook 'pbgc-vue-mode-hook 'pbgc-vue-custom)
-  ;;   (add-to-list 'eglot-server-programs '(pbgc-vue-mode "vls"))
-  ;; (require 'eglot)
-  ;;   (add-to-list 'eglot-server-programs '(vue-mode . ("vls")))
-  ;;   (add-hook 'eglot-managed-mode-hook
-  ;;             (lambda ()
-  ;;               (when (eglot-managed-p)
-  ;;                   (define-key eglot-mode-map (kbd "C-c r") 'eglot-rename)
-  ;;                   (define-key eglot-mode-map (kbd "C-c o") 'eglot-code-action-organize-imports)
-  ;;                   (define-key eglot-mode-map (kbd "C-c h") 'eldoc))))
-
-
-  ;;   (define-derived-mode pbgc-vue-mode web-mode "pbVue"
-  ;;     "A major mode derived from web-mode, for editing .vue files with LSP support.")
-  ;;   (add-to-list 'auto-mode-alist '("\\.vue\\'" . pbgc-vue-mode))
-  ;;   (defun pbgc-vue-custom ()
-  ;;     (company-mode)
-  ;;     (eglot-ensure))
-  ;;   (add-hook 'pbgc-vue-mode-hook 'pbgc-vue-custom)
-  ;;   (add-to-list 'eglot-server-programs '(pbgc-vue-mode "vls"))
-#+END_SRC
-=======
 ** embark
 #+BEGIN_SRC emacs-lisp
   (use-package embark
@@ -1683,4 +1642,9 @@ custom vue setup from here https://github.com/AdamNiederer/vue-mode/issues/109
   (embark-collect-mode . consult-preview-at-point-mode))
 #+END_SRC
 
->>>>>>> 375f96a (add emark and embark-consult)
+** emmet
+#+BEGIN_SRC emacs-lisp
+  (use-package emmet-mode)
+  (add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
+  ;; (add-hook 'css-mode-hook  'emmet-mode) ;; enable Emmet's css abbreviation.
+#+END_SRC
