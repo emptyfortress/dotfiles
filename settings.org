@@ -1643,3 +1643,11 @@ custom vue setup from here https://github.com/AdamNiederer/vue-mode/issues/109
   (embark-collect-mode . consult-preview-at-point-mode))
 #+END_SRC
 
+** emmet
+#+BEGIN_SRC emacs-lisp
+  (use-package emmet-mode)
+  (add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
+  ;; (add-hook 'css-mode-hook  'emmet-mode) ;; enable Emmet's css abbreviation.
+#+END_SRC
+
+
