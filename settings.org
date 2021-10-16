@@ -667,6 +667,9 @@ package show feedback on evil edit code
   (general-define-key
    :states 'normal
    "zF" 'vimish-fold-avy)
+  (general-define-key
+   :states 'normal
+   "ZF" 'vimish-fold-avy)
 #+END_SRC
 
 ** Insert blank lines
@@ -847,25 +850,25 @@ package show feedback on evil edit code
               ;; if you want which-key integration
               (lsp-mode . lsp-enable-which-key-integration))
       :commands (lsp lsp-deferred))
-
+  
   ;; (use-package lsp-mode
   ;;   :custom
   ;;   (lsp-vetur-format-default-formatter-css "none")
   ;;   (lsp-vetur-format-default-formatter-html "none")
   ;;   (lsp-vetur-format-default-formatter-js "none")
   ;;   (lsp-vetur-validation-template t))
-
+  
   ;; (use-package company-lsp
   ;; :after lsp-mode
   ;; :config (push 'company-lsp company-backends))
-
+  
   ;; (use-package lsp-ui
   ;; :hook (lsp-mode . lsp-ui-mode)
   ;; :custom
   ;; (lsp-ui-doc-position 'bottom))
-
+  
   ;; (use-package lsp-ivy)
-
+  
 #+END_SRC
 
 ** flycheck
@@ -1195,17 +1198,20 @@ package show feedback on evil edit code
 
 ** Autocomplete
 #+BEGIN_SRC emacs-lisp
-
+  
   (use-package company
     :ensure t
     :config
     (setq company-idle-delay 0)
-    (setq company-minimum-prefix-length 2)
+    (setq company-minimum-prefix-length 1)
     (setq lsp-completion-provider :capf)
     (global-company-mode t))
-
+  
+  (with-eval-after-load 'company
+    (define-key company-active-map (kbd "C-h") nil))
+  
   ;; (add-hook 'after-init-hook 'global-company-mode)
-
+  
 #+END_SRC
 
 ** which-key
@@ -1648,3 +1654,16 @@ custom vue setup from here https://github.com/AdamNiederer/vue-mode/issues/109
   (add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
   ;; (add-hook 'css-mode-hook  'emmet-mode) ;; enable Emmet's css abbreviation.
 #+END_SRC
+
+** winner-mode
+#+BEGIN_SRC emacs-lisp
+  (winner-mode 1)
+
+  (general-define-key
+    :states 'normal
+    "C-c h" 'winner-undo)
+  (general-define-key
+    :states 'normal
+    "C-c l" 'winner-redo)
+#+END_SRC
+
