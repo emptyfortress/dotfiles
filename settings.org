@@ -143,7 +143,7 @@
               "w" 'save-buffer
               ",w" 'projectile-save-project-buffers
               "v" 'evil-window-vsplit
-              "o" 'delete-other-windows
+              "K" 'delete-other-windows
               ",o" 'consult-outline
               "O" 'olivetti-mode
               "k" 'kill-current-buffer
@@ -364,7 +364,7 @@
    ;; (defvar keys (gtd-path "keys.org"))
   
    (setq org-agenda-files (list tickler inbox gtd ref someday))
-   (setq org-agenda-text-search-extra-files  (list inbox-archive gtd-archive))
+   ;; (setq org-agenda-text-search-extra-files  (list inbox-archive gtd-archive))
   
    (setq org-refile-targets `((gtd :maxlevel . 5)
                               (ref :maxlevel . 5)
@@ -1696,22 +1696,22 @@ custom vue setup from here https://github.com/AdamNiederer/vue-mode/issues/109
 
 ** quick switch in vue mode
 #+BEGIN_SRC emacs-lisp
-  (general-define-key
-   :states 'normal
-   :prefix ","
-   "SPC" 'javascript-mode)
-  (general-define-key
-   :states 'normal
-   :prefix ","
-   "p" 'pug-mode)
-  (general-define-key
-   :states 'normal
-   :prefix ","
-   "i" 'vue-mode)
-  (general-define-key
-   :states 'normal
-   :prefix ","
-   "u" 'scss-mode)
-
-
+  ;; (general-define-key
+  ;;  :states 'normal
+  ;;  :prefix ","
+  ;;  "SPC" 'javascript-mode)
+  ;; (general-define-key
+  ;;  :states 'normal
+  ;;  :prefix ","
+  ;;  "p" 'pug-mode)
+  ;; (general-define-key
+  ;;  :states 'normal
+  ;;  :prefix ","
+  ;;  "i" 'vue-mode)
+  ;; (general-define-key
+  ;;  :states 'normal
+  ;;  :prefix ","
+  ;;  "u" 'scss-mode)
+  
+  
 #+END_SRC
