@@ -361,12 +361,8 @@
    (defvar ref (gtd-path "ref.org"))
    ;; (defvar keys (gtd-path "keys.org"))
 
-<<<<<<< Updated upstream
-   (setq org-agenda-files (list inbox foo journal gtd ref someday tickler))
-=======
    (setq org-agenda-files (list tickler inbox gtd ref someday))
    ;; (setq org-agenda-text-search-extra-files  (list inbox-archive gtd-archive))
->>>>>>> Stashed changes
 
    (setq org-refile-targets `((gtd :maxlevel . 5)
                               (ref :maxlevel . 5)
@@ -385,15 +381,9 @@
    (setq calendar-week-start-day 1)
 
    ;; set custom agenda view
-<<<<<<< Updated upstream
    (setq org-agenda-custom-commands
          '(("f" "Ideas" todo "FOO")
          ("b" "Купить" tags "buy")))
-=======
-   ;; (setq org-agenda-custom-commands
-   ;;       '(("f" "Ideas" todo "FOO")
-   ;;       ("b" "Купить" tags "buy")))
->>>>>>> Stashed changes
 
    (defvar inbox-capture-template "* %i%?\n%U\n")
    (defvar todo-capture-template "* TODO %i%?          \n%U\n%a\n")
@@ -537,34 +527,6 @@
 
 ** custom agenda views
 #+BEGIN_SRC emacs-lisp
-<<<<<<< Updated upstream
-  (setq org-agenda-custom-commands
-        '(("n" "Agenda and all todo"
-           ((agenda "")
-            (alltodo ""
-                     ((org-agenda-skip-function
-                       '(org-agenda-skip-entry-if 'todo '("FOO"))
-                       ))
-                     )))
-          ("w" "Waiting state"
-           ((agenda "")
-            (todo "WAITING")))
-          ("d" "Upcoming deadlines" agenda ""
-           ((org-agenda-entry-types '(:deadline))
-            ;; a slower way to do the same thing
-            ;; (org-agenda-skip-function '(org-agenda-skip-entry-if 'notdeadline))
-            (org-agenda-span 1)
-            (org-deadline-warning-days 60)
-            (org-agenda-time-grid nil)))
-          ("f" "foo"
-           ((todo "FOO")))
-          ("b" "buy"
-           ((tags "buy")))
-          ("A" "Archive search" search ""
-           ((org-agenda-files (file-expand-wildcards "~/Develop/org/*.org_archive"))))
-          )
-        )
-=======
       (setq org-agenda-custom-commands
             '(("f" "Agenda and todo"
              ((agenda "")
@@ -592,7 +554,6 @@
                ((org-agenda-files (file-expand-wildcards "~/Develop/org/*.org_archive"))))
               )
             )
->>>>>>> Stashed changes
 
 #+END_SRC
 
@@ -705,13 +666,10 @@ package show feedback on evil edit code
 
   (general-define-key
    :states 'normal
-<<<<<<< Updated upstream
-=======
    "zs" 'vimish-fold--save-folds)
 
   (general-define-key
    :states 'normal
->>>>>>> Stashed changes
    "zF" 'vimish-fold-avy)
 #+END_SRC
 
@@ -806,8 +764,6 @@ package show feedback on evil edit code
           ",v" 'vue-mode-reparse))
 
   (add-hook 'vue-mode-hook 'vuejs-custom)
-<<<<<<< Updated upstream
-=======
   (add-hook 'after-init-hook #'global-prettier-mode)
 
   ;; (require 'eglot)
@@ -817,7 +773,6 @@ package show feedback on evil edit code
   ;; (add-to-list 'auto-mode-alist '("\\.vue\\'" . genehack-vue-mode))
   ;; (add-hook 'genehack-vue-mode-hook #'eglot-ensure)
   ;; (add-to-list 'eglot-server-programs '(genehack-vue-mode "vls"))
->>>>>>> Stashed changes
 
 #+END_SRC
 
@@ -1569,107 +1524,66 @@ custom vue setup from here https://github.com/AdamNiederer/vue-mode/issues/109
   ;; (use-package polymode
   ;;       :ensure t
   ;;       :defer t
-<<<<<<< Updated upstream
-  ;;       ;; :hook (vue-mode . lsp-deferred)
-  ;;       :mode ("\\.vue\\'" . vue-mode)
-  ;;       :config
-
-=======
   ;;       :hook (vue-mode . lsp-deferred)
   ;;       :mode ("\\.vue\\'" . vue-mode)
   ;;       :config
 
->>>>>>> Stashed changes
   ;;       (define-innermode poly-vue-template-innermode
   ;;         :mode 'html-mode
   ;;         :head-matcher "<[[:space:]]*template[[:space:]]*[[:space:]]*>"
   ;;         :tail-matcher "</[[:space:]]*template[[:space:]]*[[:space:]]*>"
   ;;         :head-mode 'host
   ;;         :tail-mode 'host)
-<<<<<<< Updated upstream
 
-=======
-
->>>>>>> Stashed changes
   ;;       (define-innermode poly-vue-script-innermode
   ;;         :mode 'js-mode
   ;;         :head-matcher "<[[:space:]]*script[[:space:]]*[[:space:]]*>"
   ;;         :tail-matcher "</[[:space:]]*script[[:space:]]*[[:space:]]*>"
   ;;         :head-mode 'host
   ;;         :tail-mode 'host)
-<<<<<<< Updated upstream
 
-=======
-
->>>>>>> Stashed changes
   ;;       (define-innermode poly-vue-typescript-innermode
   ;;         :mode 'typescript-mode
   ;;         :head-matcher "<[[:space:]]*script[[:space:]]*lang=[[:space:]]*[\"'][[:space:]]*ts[[:space:]]*[\"'][[:space:]]*>"
   ;;         :tail-matcher "</[[:space:]]*script[[:space:]]*[[:space:]]*>"
   ;;         :head-mode 'host
   ;;         :tail-mode 'host)
-<<<<<<< Updated upstream
 
-=======
-
->>>>>>> Stashed changes
   ;;       (define-innermode poly-vue-javascript-innermode
   ;;         :mode 'js2-mode
   ;;         :head-matcher "<[[:space:]]*script[[:space:]]*lang=[[:space:]]*[\"'][[:space:]]*js[[:space:]]*[\"'][[:space:]]*>"
   ;;         :tail-matcher "</[[:space:]]*script[[:space:]]*[[:space:]]*>"
   ;;         :head-mode 'host
   ;;         :tail-mode 'host)
-<<<<<<< Updated upstream
 
-=======
-
->>>>>>> Stashed changes
   ;;       (define-auto-innermode poly-vue-template-tag-lang-innermode
   ;;         :head-matcher "<[[:space:]]*template[[:space:]]*lang=[[:space:]]*[\"'][[:space:]]*[[:alpha:]]+[[:space:]]*[\"'][[:space:]]*>"
   ;;         :tail-matcher "</[[:space:]]*template[[:space:]]*[[:space:]]*>"
   ;;         :mode-matcher (cons  "<[[:space:]]*template[[:space:]]*lang=[[:space:]]*[\"'][[:space:]]*\\([[:alpha:]]+\\)[[:space:]]*[\"'][[:space:]]*>" 1)
   ;;         :head-mode 'host
   ;;         :tail-mode 'host)
-<<<<<<< Updated upstream
 
-=======
-
->>>>>>> Stashed changes
   ;;       (define-auto-innermode poly-vue-script-tag-lang-innermode
   ;;         :head-matcher "<[[:space:]]*script[[:space:]]*lang=[[:space:]]*[\"'][[:space:]]*[[:alpha:]]+[[:space:]]*[\"'][[:space:]]*>"
   ;;         :tail-matcher "</[[:space:]]*script[[:space:]]*[[:space:]]*>"
   ;;         :mode-matcher (cons  "<[[:space:]]*script[[:space:]]*lang=[[:space:]]*[\"'][[:space:]]*\\([[:alpha:]]+\\)[[:space:]]*[\"'][[:space:]]*>" 1)
   ;;         :head-mode 'host
   ;;         :tail-mode 'host)
-<<<<<<< Updated upstream
 
-=======
-
->>>>>>> Stashed changes
   ;;       (define-auto-innermode poly-vue-style-tag-lang-innermode
   ;;               :head-matcher "<[[:space:]]*\\(?:style\\)\\(?:scoped\\|[[:space:]]\\)*lang=[[:space:]]*[\"'][[:space:]]*[[:alpha:]]+[[:space:]]*[\"']*\\(?:scoped\\|[[:space:]]\\)*>"
   ;;               :tail-matcher "</[[:space:]]*\\(?:style\\)[[:space:]]*>"
   ;;               :mode-matcher (cons  "<[[:space:]]*\\(?:style\\)\\(?:scoped\\|[[:space:]]\\)*lang=[[:space:]]*[\"'][[:space:]]*\\([[:alpha:]]+\\)[[:space:]]*[\"']\\(?:scoped\\|[[:space:]]\\)*>" 1)
   ;;               :head-mode 'host
   ;;               :tail-mode 'host)
-<<<<<<< Updated upstream
 
-=======
-
->>>>>>> Stashed changes
   ;;       (define-innermode poly-vue-style-innermode
   ;;         :mode 'css-mode
   ;;         :head-matcher "<[[:space:]]*\\(?:style\\)[[:space:]]*\\(?:scoped\\|[[:space:]]\\)*>"
   ;;         :tail-matcher "</[[:space:]]*\\(?:style\\)[[:space:]]*>"
   ;;         :head-mode 'host
   ;;         :tail-mode 'host)
-<<<<<<< Updated upstream
 
-
-=======
-
-
->>>>>>> Stashed changes
   ;;       (define-polymode vue-mode
   ;;         :hostmode 'poly-sgml-hostmode
   ;;         :innermodes '(
@@ -1682,11 +1596,6 @@ custom vue setup from here https://github.com/AdamNiederer/vue-mode/issues/109
   ;;                       poly-vue-script-innermode
   ;;                       poly-vue-style-innermode
   ;;                       )))
-<<<<<<< Updated upstream
-
-=======
-
->>>>>>> Stashed changes
 #+END_SRC
 
 ** expand-region
@@ -1761,8 +1670,6 @@ custom vue setup from here https://github.com/AdamNiederer/vue-mode/issues/109
   (add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
   ;; (add-hook 'css-mode-hook  'emmet-mode) ;; enable Emmet's css abbreviation.
 #+END_SRC
-<<<<<<< Updated upstream
-=======
 
 ** winner-mode
 #+BEGIN_SRC emacs-lisp
@@ -1797,4 +1704,3 @@ custom vue setup from here https://github.com/AdamNiederer/vue-mode/issues/109
 
 
 #+END_SRC
->>>>>>> Stashed changes
