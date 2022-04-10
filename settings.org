@@ -846,21 +846,21 @@ package show feedback on evil edit code
 
 ** lsp
 #+BEGIN_SRC emacs-lisp
-    (use-package lsp-mode
-      :init
-      ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-      (setq lsp-keymap-prefix "C-c l")
-      (setq lsp-headerline-breadcrumb-enable nil)
-      (setq lsp-ui-sideline-enable nil)
-      (setq lsp-ui-doc-enable nil)
-      (setq lsp-vetur-experimental-template-interpolation-service t)
-      :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-              (js-mode . lsp-deferred)
-              (typescript-mode . lsp-deferred)
-              (vue-mode . lsp-deferred)
-              ;; if you want which-key integration
-              (lsp-mode . lsp-enable-which-key-integration))
-      :commands (lsp lsp-deferred))
+    ;; (use-package lsp-mode
+    ;;   :init
+    ;;   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+    ;;   (setq lsp-keymap-prefix "C-c l")
+    ;;   (setq lsp-headerline-breadcrumb-enable nil)
+    ;;   (setq lsp-ui-sideline-enable nil)
+    ;;   (setq lsp-ui-doc-enable nil)
+    ;;   (setq lsp-vetur-experimental-template-interpolation-service t)
+    ;;   :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+    ;;           (js-mode . lsp-deferred)
+    ;;           (typescript-mode . lsp-deferred)
+    ;;           (vue-mode . lsp-deferred)
+    ;;           ;; if you want which-key integration
+    ;;           (lsp-mode . lsp-enable-which-key-integration))
+    ;;   :commands (lsp lsp-deferred))
 
   ;; (use-package lsp-mode
   ;;   :custom
