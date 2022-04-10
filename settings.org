@@ -860,25 +860,25 @@ package show feedback on evil edit code
               ;; if you want which-key integration
               (lsp-mode . lsp-enable-which-key-integration))
       :commands (lsp lsp-deferred))
-  
+
   ;; (use-package lsp-mode
   ;;   :custom
   ;;   (lsp-vetur-format-default-formatter-css "none")
   ;;   (lsp-vetur-format-default-formatter-html "none")
   ;;   (lsp-vetur-format-default-formatter-js "none")
   ;;   (lsp-vetur-validation-template t))
-  
+
       ;; (use-package company-lsp
       ;; :after lsp-mode
       ;; :config (push 'company-lsp company-backends))
-  
+
     ;; (use-package lsp-ui
     ;; :hook (lsp-mode . lsp-ui-mode)
     ;; :custom
     ;; (lsp-ui-doc-position 'bottom))
-  
+
   ;; (use-package lsp-ivy)
-  
+
 #+END_SRC
 
 ** flycheck
@@ -1682,24 +1682,15 @@ custom vue setup from here https://github.com/AdamNiederer/vue-mode/issues/109
     "C-c l" 'winner-redo)
 #+END_SRC
 
-** quick switch in vue mode
+** delete eslint buffer
 #+BEGIN_SRC emacs-lisp
-  ;; (general-define-key
-  ;;  :states 'normal
-  ;;  :prefix ","
-  ;;  "SPC" 'javascript-mode)
-  ;; (general-define-key
-  ;;  :states 'normal
-  ;;  :prefix ","
-  ;;  "p" 'pug-mode)
-  ;; (general-define-key
-  ;;  :states 'normal
-  ;;  :prefix ","
-  ;;  "i" 'vue-mode)
-  ;; (general-define-key
-  ;;  :states 'normal
-  ;;  :prefix ","
-  ;;  "u" 'scss-mode)
-
-
+  (defun killer()
+    (interactive)
+    (kill-buffer "*Flycheck checkers*"))
+  
+  (general-define-key
+    :states 'normal
+    :prefix ","
+    ",k" 'killer)
+  
 #+END_SRC
